@@ -113,7 +113,7 @@ parameters:
   name: THREESCALE_GATEWAY_NAME
   required: true
 - description: "Docker image to use."
-  value: 'rhamp10/apicast-gateway:1.0.0-4'
+  value: 'registry.access.redhat.com/rhamp10/apicast-gateway:1.0.0-4'
   name: THREESCALE_GATEWAY_IMAGE
   required: true
 - description: "DNS Resolver for openresty, if empty it will be autodiscovered"

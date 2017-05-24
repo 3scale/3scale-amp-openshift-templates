@@ -54,8 +54,8 @@ objects:
             value: "${MANAGEMENT_API}"
           - name: OPENSSL_VERIFY
             value: "${OPENSSL_VERIFY}"
-          image: 3scale-amp20/apicast-gateway:1.0-3
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/apicast-gateway:1.0
+          imagePullPolicy: Always
           name: "${APICAST_NAME}"
           livenessProbe:
             httpGet:

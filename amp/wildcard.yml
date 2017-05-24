@@ -32,8 +32,8 @@ objects:
             value: "lazy"
           - name: APICAST_CONFIGURATION_CACHE
             value: "0"
-          image: 3scale-amp20/apicast-gateway:1.0-3
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/apicast-gateway:1.0
+          imagePullPolicy: Always
           name: apicast-router
           command: ['bin/apicast']
           livenessProbe:

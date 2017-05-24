@@ -163,8 +163,8 @@ objects:
             value: "backend-redis:6379/1"
           - name: RACK_ENV
             value: "production"
-          image: 3scale-amp20/backend:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/backend:1.0
+          imagePullPolicy: Always
           name: backend-cron
     triggers:
     - type: ConfigChange
@@ -186,7 +186,7 @@ objects:
       spec:
         containers:
         - image: ${REDIS_IMAGE}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: backend-redis
           readinessProbe:
             exec:
@@ -264,8 +264,8 @@ objects:
             value: "${SYSTEM_BACKEND_USERNAME}"
           - name: CONFIG_INTERNAL_API_PASSWORD
             value: "${SYSTEM_BACKEND_PASSWORD}"
-          image: 3scale-amp20/backend:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/backend:1.0
+          imagePullPolicy: Always
           name: backend-listener
           livenessProbe:
             initialDelaySeconds: 30
@@ -371,8 +371,8 @@ objects:
             value: http://system-provider:3000/master/events/import
           - name: CONFIG_EVENTS_HOOK_SHARED_SECRET
             value: ${SYSTEM_BACKEND_SHARED_SECRET}
-          image: 3scale-amp20/backend:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/backend:1.0
+          imagePullPolicy: Always
           name: backend-worker
     triggers:
     - type: ConfigChange
@@ -422,7 +422,7 @@ objects:
         containers:
         - args:
           image: ${REDIS_IMAGE}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: system-redis
           terminationMessagePath: /dev/termination-log
           volumeMounts:
@@ -518,8 +518,8 @@ objects:
             value: '5'
           - name: FULL_REINDEX_INTERVAL
             value: '60'
-          image: 3scale-amp20/system:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/system:1.0
+          imagePullPolicy: Always
           name: system-sphinx
           livenessProbe:
             tcpSocket:
@@ -565,8 +565,8 @@ objects:
         containers:
         - args:
           env:
-          image: 3scale-amp20/memcached:1.4.15-7
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/memcached:1.4.15
+          imagePullPolicy: Always
           name: memcache
           readinessProbe:
             exec:
@@ -684,8 +684,8 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/2"
-          image: 3scale-amp20/apicast-gateway:1.0-3
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/apicast-gateway:1.0
+          imagePullPolicy: Always
           name: apicast-staging
           livenessProbe:
             httpGet:
@@ -767,8 +767,8 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/1"
-          image: 3scale-amp20/apicast-gateway:1.0-3
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/apicast-gateway:1.0
+          imagePullPolicy: Always
           name: apicast-production
           livenessProbe:
             httpGet:
@@ -886,8 +886,8 @@ objects:
         containers:
         - args:
           env: *base_env
-          image: 3scale-amp20/system:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/system:1.0
+          imagePullPolicy: Always
           command: ['env', 'TENANT_MODE=provider', 'PORT=3000', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
           name: system-provider
           livenessProbe:
@@ -916,9 +916,9 @@ objects:
             mountPath: /opt/system/public/system
         - args:
           env: *base_env
-          image: 3scale-amp20/system:1.0-2
+          image: 3scale-amp20/system:1.0
           command: ['env', 'TENANT_MODE=developer', 'PORT=3001', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: system-developer
           livenessProbe:
             timeoutSeconds: 10
@@ -979,8 +979,8 @@ objects:
           - 'resque:work'
           - 'QUEUE=*'
           env: *base_env
-          image: 3scale-amp20/system:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/system:1.0
+          imagePullPolicy: Always
           name: system-resque
           volumeMounts:
           - name: system-storage
@@ -990,8 +990,8 @@ objects:
           - 'resque:scheduler'
           - 'QUEUE=*'
           env: *base_env
-          image: 3scale-amp20/system:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/system:1.0
+          imagePullPolicy: Always
           name: system-scheduler
         volumes:
         - name: system-storage
@@ -1026,8 +1026,8 @@ objects:
           - rake
           - sidekiq:worker
           env: *base_env
-          image: 3scale-amp20/system:1.0-2
-          imagePullPolicy: IfNotPresent
+          image: 3scale-amp20/system:1.0
+          imagePullPolicy: Always
           name: system-sidekiq
           volumeMounts:
           - name: system-storage
@@ -1098,7 +1098,7 @@ objects:
           volumeMounts:
           - name: 'mysql-storage'
             mountPath: /var/lib/mysql/data
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
         volumes:
         - name: 'mysql-storage'
           persistentVolumeClaim:
@@ -1172,7 +1172,7 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: 2.0.0-CR2-redhat-1
+  value: 2.0.0-CR2-redhat-2
   required: true
 - name: ADMIN_PASSWORD
   required: true
@@ -1232,11 +1232,11 @@ parameters:
 - name: REDIS_IMAGE
   description: Redis image to use
   required: true
-  value: rhscl/redis-32-rhel7:3.2-5.7
+  value: rhscl/redis-32-rhel7:3.2
 - name: MYSQL_IMAGE
   description: Mysql image to use
   required: true
-  value: rhscl/mysql-56-rhel7:5.6-13.14
+  value: rhscl/mysql-56-rhel7:5.6
 - name: SYSTEM_BACKEND_SHARED_SECRET
   description: Shared secret to import events from backend to system.
   generate: expression

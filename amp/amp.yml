@@ -692,7 +692,7 @@ objects:
         containers:
         - args:
           env:
-          image: 3scale-amp20/memcached:1.4.15-8
+          image: 3scale-amp21/memcached:1.4.15-8
           imagePullPolicy: Always
           name: memcache
           readinessProbe:

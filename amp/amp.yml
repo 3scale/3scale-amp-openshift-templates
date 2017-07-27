@@ -179,6 +179,29 @@ objects:
         kind: DockerImage
         name: 3scale-amp21/wildcard-router:1.1
 
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-zync
+    labels:
+      app: zync
+    annotations:
+      openshift.io/display-name: AMP Zync
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP Zync (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER1-redhat-1"
+    - name: "2.1.0-ER1-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP Zync 2.1.0-ER1-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/zync:1.1
+
 - apiVersion: "v1"
   kind: "PersistentVolumeClaim"
   metadata:
@@ -1102,6 +1125,7 @@ objects:
         forum: false
         published_service_plan_signup: true
         apicast_oidc: true
+
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -1487,40 +1511,7 @@ objects:
     port: ""
     authentication: ""
     openssl.verify.mode: ""
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    name: postgresql
-  spec:
-    tags:
-    - name: '9.5'
-      from:
-        kind: DockerImage
-        name: centos/postgresql-95-centos7
 
-
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    name: amp-zync
-    labels:
-      app: zync
-    annotations:
-      openshift.io/display-name: AMP Zync
-  spec:
-    tags:
-    - name: latest
-      annotations:
-        openshift.io/display-name: AMP Zync (latest)
-      from:
-        kind: ImageStreamTag
-        name: "${AMP_RELEASE}"
-    - name: "${AMP_RELEASE}"
-      annotations:
-        openshift.io/display-name: AMP Zync ${AMP_RELEASE}
-      from:
-        kind: DockerImage
-        name: quay.io/3scale/amp:zync-${AMP_RELEASE}
 - kind: Secret
   apiVersion: v1
   stringData:
@@ -1654,14 +1645,6 @@ objects:
     strategy:
       type: Recreate
     triggers:
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - postgresql
-        from:
-          kind: ImageStreamTag
-          name: postgresql:9.5
     - type: ConfigChange
     replicas: 1
     selector:
@@ -1673,7 +1656,7 @@ objects:
       spec:
         containers:
         - name: postgresql
-          image: " "
+          image: "rhscl/postgresql-95-rhel7:9.5"
           ports:
           - containerPort: 5432
             protocol: TCP
@@ -1722,17 +1705,14 @@ parameters:
   generate: expression
   from: "[a-zA-Z0-9]{16}"
   required: true
-
 - name: ZYNC_SECRET_KEY_BASE
   generate: expression
   from: "[a-zA-Z0-9]{16}"
   required: true
-
 - name: ZYNC_AUTHENTICATION_TOKEN
   generate: expression
   from: "[a-zA-Z0-9]{16}"
   required: true
-
 - name: AMP_RELEASE
   description: "AMP release tag."
   value: "2.1.0-ER1-redhat-1"

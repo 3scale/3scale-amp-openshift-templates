@@ -43,6 +43,11 @@ base_env: &base_env
   value: "${SYSTEM_APP_SECRET_KEY_BASE}"
 - name: AMP_RELEASE
   value: "${AMP_RELEASE}"
+- name: ZYNC_AUTHENTICATION_TOKEN
+  valueFrom:
+    secretKeyRef:
+      name: zync
+      key: ZYNC_AUTHENTICATION_TOKEN
 - name: SMTP_ADDRESS
   valueFrom:
     configMapKeyRef:
@@ -80,6 +85,8 @@ base_env: &base_env
       key: openssl.verify.mode
 - name: BACKEND_ROUTE
   value: "https://backend-${TENANT_NAME}.${WILDCARD_DOMAIN}"
+- name: SSL_CERT_DIR
+  value: "/etc/pki/tls/certs"
 
 apiVersion: v1
 kind: Template
@@ -87,6 +94,113 @@ metadata:
   name: "system"
 message: "Login on https://${TENANT_NAME}-admin.${WILDCARD_DOMAIN} as ${ADMIN_USERNAME}/${ADMIN_PASSWORD}"
 objects:
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-system
+    annotations:
+      openshift.io/display-name: AMP System
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP System (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER1-redhat-1"
+    - name: "2.1.0-ER1-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP system 2.1.0-ER1-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/system:1.1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-backend
+    annotations:
+      openshift.io/display-name: AMP backend
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: amp-backend (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER1-redhat-1"
+    - name: "2.1.0-ER1-redhat-1"
+      annotations:
+        openshift.io/display-name: amp-backend 2.1.0-ER1-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/backend:1.1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-apicast
+    annotations:
+      openshift.io/display-name: AMP APIcast
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP APIcast (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER1-redhat-1"
+    - name: "2.1.0-ER1-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP APIcast 2.1.0-ER1-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/apicast-gateway:1.1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-wildcard-router
+    annotations:
+      openshift.io/display-name: AMP APIcast Wildcard Router
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP APIcast Wildcard Router (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER1-redhat-1"
+    - name: "2.1.0-ER1-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP APIcast Wildcard Router 2.1.0-ER1-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/wildcard-router:1.1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-zync
+    labels:
+      app: zync
+    annotations:
+      openshift.io/display-name: AMP Zync
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP Zync (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER1-redhat-1"
+    - name: "2.1.0-ER1-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP Zync 2.1.0-ER1-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/zync:1.1
 
 - apiVersion: "v1"
   kind: "PersistentVolumeClaim"
@@ -163,11 +277,19 @@ objects:
             value: "backend-redis:6379/1"
           - name: RACK_ENV
             value: "production"
-          image: 3scale-amp20/backend:1.0
+          image: amp-backend:latest
           imagePullPolicy: Always
           name: backend-cron
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - backend-cron
+        from:
+          kind: ImageStreamTag
+          name: amp-backend:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -245,7 +367,7 @@ objects:
       spec:
         containers:
         - args:
-          - 3scale_backend
+          - bin/3scale_backend
           - start
           - "-e"
           - production
@@ -264,7 +386,7 @@ objects:
             value: "${SYSTEM_BACKEND_USERNAME}"
           - name: CONFIG_INTERNAL_API_PASSWORD
             value: "${SYSTEM_BACKEND_PASSWORD}"
-          image: 3scale-amp20/backend:1.0
+          image: amp-backend:latest
           imagePullPolicy: Always
           name: backend-listener
           livenessProbe:
@@ -283,6 +405,14 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - backend-listener
+        from:
+          kind: ImageStreamTag
+          name: amp-backend:latest
 
 - apiVersion: v1
   kind: Service
@@ -300,6 +430,8 @@ objects:
   kind: Service
   metadata:
     name: backend-listener
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name": "backend-redis", "kind": "Service"}]'
   spec:
     ports:
     - port: 3000
@@ -313,6 +445,8 @@ objects:
   kind: Service
   metadata:
     name: system-provider
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name": "system-developer", "kind": "Service"}]'
   spec:
     ports:
     - port: 3000
@@ -358,7 +492,7 @@ objects:
       spec:
         containers:
         - args:
-          - 3scale_backend_worker
+          - bin/3scale_backend_worker
           - run
           env:
           - name: CONFIG_REDIS_PROXY
@@ -371,11 +505,19 @@ objects:
             value: http://system-provider:3000/master/events/import
           - name: CONFIG_EVENTS_HOOK_SHARED_SECRET
             value: ${SYSTEM_BACKEND_SHARED_SECRET}
-          image: 3scale-amp20/backend:1.0
+          image: amp-backend:latest
           imagePullPolicy: Always
           name: backend-worker
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - backend-worker
+        from:
+          kind: ImageStreamTag
+          name: amp-backend:latest
 
 - kind: Service
   apiVersion: v1
@@ -518,7 +660,7 @@ objects:
             value: '5'
           - name: FULL_REINDEX_INTERVAL
             value: '60'
-          image: 3scale-amp20/system:1.0
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-sphinx
           livenessProbe:
@@ -528,6 +670,14 @@ objects:
             periodSeconds: 10
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - system-sphinx
+        from:
+          kind: ImageStreamTag
+          name: amp-system:latest
 
 - apiVersion: v1
   kind: Service
@@ -684,7 +834,7 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/2"
-          image: 3scale-amp20/apicast-gateway:1.0
+          image: amp-apicast:latest
           imagePullPolicy: Always
           name: apicast-staging
           livenessProbe:
@@ -708,6 +858,14 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - apicast-staging
+        from:
+          kind: ImageStreamTag
+          name: amp-apicast:latest
 
 - apiVersion: v1
   kind: Service
@@ -767,7 +925,7 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/1"
-          image: 3scale-amp20/apicast-gateway:1.0
+          image: amp-apicast:latest
           imagePullPolicy: Always
           name: apicast-production
           livenessProbe:
@@ -791,11 +949,21 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - apicast-production
+        from:
+          kind: ImageStreamTag
+          name: amp-apicast:latest
 
 - apiVersion: v1
   kind: Service
   metadata:
     name: apicast-production
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name": "apicast-staging", "kind": "Service"}]'
   spec:
     ports:
     - name: gateway
@@ -846,6 +1014,121 @@ objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
+    name: apicast-wildcard-router
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: apicast-wildcard-router
+    strategy:
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 1800
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          deploymentconfig: apicast-wildcard-router
+      spec:
+        containers:
+        - env:
+          - name: API_HOST
+            value: http://system-provider:3000
+          - name: ACCESS_TOKEN
+            value: "${APICAST_ACCESS_TOKEN}"
+          image: amp-wildcard-router:latest
+          imagePullPolicy: Always
+          name: apicast-wildcard-router
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+            name: http
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            tcpSocket:
+              port: http
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - apicast-wildcard-router
+        from:
+          kind: ImageStreamTag
+          name: amp-wildcard-router:latest
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: apicast-wildcard-router
+  spec:
+    ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: http
+      name: http
+    selector:
+      deploymentconfig: apicast-wildcard-router
+
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: apicast-wildcard-router-route
+    labels:
+      app: apicast-wildcard-router
+  spec:
+    host: apicast-${TENANT_NAME}.${WILDCARD_DOMAIN}
+    to:
+      kind: Service
+      name: apicast-wildcard-router
+    port:
+      targetPort: http
+    wildcardPolicy: Subdomain
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Allow
+
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: system
+  data:
+    zync.yml: |
+      production:
+        endpoint: 'http://zync:8080'
+        authentication:
+          token: "<%= ENV.fetch('ZYNC_AUTHENTICATION_TOKEN') %>"
+        connect_timeout: 5
+        send_timeout: 5
+        receive_timeout: 10
+        root_url: 'http://system-provider:3000'
+    rolling_updates.yml: |
+      production:
+        old_charts: false
+        new_provider_documentation: false
+        proxy_pro: false
+        instant_bill_plan_change: false
+        service_permissions: true
+        async_apicast_deploy: false
+        duplicate_application_id: true
+        duplicate_user_key: true
+        plan_changes_wizard: false
+        require_cc_on_signup: false
+        apicast_per_service: true
+        new_notification_system: true
+        cms_api: false
+        apicast_v2: true
+        forum: false
+        published_service_plan_signup: true
+        apicast_oidc: true
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
     name: system-app
   spec:
     replicas: 1
@@ -886,7 +1169,7 @@ objects:
         containers:
         - args:
           env: *base_env
-          image: 3scale-amp20/system:1.0
+          image: amp-system:latest
           imagePullPolicy: Always
           command: ['env', 'TENANT_MODE=provider', 'PORT=3000', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
           name: system-provider
@@ -914,9 +1197,15 @@ objects:
           volumeMounts:
           - name: system-storage
             mountPath: /opt/system/public/system
+          - name: system-config
+            mountPath: /opt/system/config/zync.yml
+            subPath: zync.yml
+          - name: system-config
+            mountPath: /opt/system/config/rolling_updates.yml
+            subPath: rolling_updates.yml
         - args:
           env: *base_env
-          image: 3scale-amp20/system:1.0
+          image: amp-system:latest
           command: ['env', 'TENANT_MODE=developer', 'PORT=3001', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
           imagePullPolicy: Always
           name: system-developer
@@ -945,12 +1234,35 @@ objects:
           - name: system-storage
             mountPath: /opt/system/public/system
             readOnly: true
+          - name: system-config
+            mountPath: /opt/system/config/zync.yml
+            subPath: zync.yml
+          - name: system-config
+            mountPath: /opt/system/config/rolling_updates.yml
+            subPath: rolling_updates.yml
         volumes:
         - name: system-storage
           persistentVolumeClaim:
             claimName: system-storage
+        - name: system-config
+          configMap:
+            name: system
+            items:
+            - key: zync.yml
+              path: zync.yml
+            - key: rolling_updates.yml
+              path: rolling_updates.yml
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - system-provider
+        - system-developer
+        from:
+          kind: ImageStreamTag
+          name: amp-system:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -979,7 +1291,7 @@ objects:
           - 'resque:work'
           - 'QUEUE=*'
           env: *base_env
-          image: 3scale-amp20/system:1.0
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-resque
           volumeMounts:
@@ -990,7 +1302,7 @@ objects:
           - 'resque:scheduler'
           - 'QUEUE=*'
           env: *base_env
-          image: 3scale-amp20/system:1.0
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-scheduler
         volumes:
@@ -999,6 +1311,15 @@ objects:
             claimName: system-storage
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - system-scheduler
+        - system-resque
+        from:
+          kind: ImageStreamTag
+          name: amp-system:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -1026,19 +1347,40 @@ objects:
           - rake
           - sidekiq:worker
           env: *base_env
-          image: 3scale-amp20/system:1.0
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-sidekiq
           volumeMounts:
           - name: system-storage
             mountPath: /opt/system/public/system
+          - name: system-config
+            mountPath: /opt/system/config/zync.yml
+            subPath: zync.yml
+          - name: system-config
+            mountPath: /opt/system/config/rolling_updates.yml
+            subPath: rolling_updates.yml
         volumes:
         - name: system-storage
           persistentVolumeClaim:
             claimName: system-storage
+        - name: system-config
+          configMap:
+            name: system
+            items:
+            - key: zync.yml
+              path: zync.yml
+            - key: rolling_updates.yml
+              path: rolling_updates.yml
     triggers:
     - type: ConfigChange
-
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - system-sidekiq
+        from:
+          kind: ImageStreamTag
+          name: amp-system:latest
 
 - kind: DeploymentConfig
   apiVersion: v1
@@ -1103,6 +1445,7 @@ objects:
         - name: 'mysql-storage'
           persistentVolumeClaim:
             claimName: 'mysql-storage'
+
 - kind: ConfigMap
   apiVersion: v1
   metadata:
@@ -1169,10 +1512,210 @@ objects:
     authentication: ""
     openssl.verify.mode: ""
 
+- kind: Secret
+  apiVersion: v1
+  stringData:
+    SECRET_KEY_BASE: "${ZYNC_SECRET_KEY_BASE}"
+    DATABASE_URL: "postgresql://zync:${ZYNC_DATABASE_PASSWORD}@zync-database:5432/zync_production"
+    ZYNC_DATABASE_PASSWORD: "${ZYNC_DATABASE_PASSWORD}"
+    ZYNC_AUTHENTICATION_TOKEN: "${ZYNC_AUTHENTICATION_TOKEN}"
+  metadata:
+    name: zync
+  type: Opaque
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+    labels:
+      app: zync
+    name: zync
+  spec:
+    replicas: 1
+    selector:
+      app: zync
+      deploymentconfig: zync
+    template:
+      metadata:
+        annotations:
+        labels:
+          app: zync
+          deploymentconfig: zync
+      spec:
+        containers:
+        - image: " "
+          name: zync
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: '1'
+              memory: 250Mi
+            requests:
+              cpu: 250m
+              memory: 150M
+          env:
+          - name: RAILS_LOG_TO_STDOUT
+            value: 'true'
+          - name: RAILS_ENV
+            value: production
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: zync
+                key: DATABASE_URL
+          - name: SECRET_KEY_BASE
+            valueFrom:
+              secretKeyRef:
+                name: zync
+                key: SECRET_KEY_BASE
+          - name: ZYNC_AUTHENTICATION_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: zync
+                key: ZYNC_AUTHENTICATION_TOKEN
+          livenessProbe:
+            httpGet:
+              path: /status/live
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /status/ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - zync
+        from:
+          kind: ImageStreamTag
+          name: amp-zync:latest
+      type: ImageChange
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name": "zync-database", "kind": "Service"}]'
+    labels:
+      app: zync
+    name: zync
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: zync
+      deploymentconfig: zync
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "zync-database"
+  spec:
+    ports:
+    - name: postgresql
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 0
+    selector:
+      name: "zync-database"
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: zync-database
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "zync-database"
+    template:
+      metadata:
+        labels:
+          name: "zync-database"
+      spec:
+        containers:
+        - name: postgresql
+          image: "rhscl/postgresql-95-rhel7:9.5"
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          readinessProbe:
+            timeoutSeconds: 1
+            initialDelaySeconds: 5
+            exec:
+              command:
+              - "/bin/sh"
+              - "-i"
+              - "-c"
+              - psql -h 127.0.0.1 -U zync -q -d zync_production -c 'SELECT 1'
+          livenessProbe:
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: 5432
+          env:
+          - name: POSTGRESQL_USER
+            value: zync
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: zync
+                key: ZYNC_DATABASE_PASSWORD
+          - name: POSTGRESQL_DATABASE
+            value: "zync_production"
+          resources:
+            limits:
+              memory: "2G"
+          volumeMounts:
+          - name: "zync-database-data"
+            mountPath: "/var/lib/pgsql/data"
+          imagePullPolicy: Always
+        volumes:
+        - name: "zync-database-data"
+          emptyDir:
+            medium: ''
+        restartPolicy: Always
+
 parameters:
+
+- name: ZYNC_DATABASE_PASSWORD
+  displayName: PostgreSQL Connection Password
+  description: Password for the PostgreSQL connection user.
+  generate: expression
+  from: "[a-zA-Z0-9]{16}"
+  required: true
+- name: ZYNC_SECRET_KEY_BASE
+  generate: expression
+  from: "[a-zA-Z0-9]{16}"
+  required: true
+- name: ZYNC_AUTHENTICATION_TOKEN
+  generate: expression
+  from: "[a-zA-Z0-9]{16}"
+  required: true
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: 2.0.0-CR2-redhat-2
+  value: "2.1.0-ER1-redhat-1"
   required: true
 - name: ADMIN_PASSWORD
   required: true
@@ -1232,11 +1775,11 @@ parameters:
 - name: REDIS_IMAGE
   description: Redis image to use
   required: true
-  value: rhscl/redis-32-rhel7:3.2
+  value: "rhscl/redis-32-rhel7:3.2-5.10"
 - name: MYSQL_IMAGE
   description: Mysql image to use
   required: true
-  value: rhscl/mysql-56-rhel7:5.6
+  value: "rhscl/mysql-56-rhel7:5.6-13.19"
 - name: SYSTEM_BACKEND_SHARED_SECRET
   description: Shared secret to import events from backend to system.
   generate: expression

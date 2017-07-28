@@ -54,7 +54,7 @@ objects:
             value: "${MANAGEMENT_API}"
           - name: OPENSSL_VERIFY
             value: "${OPENSSL_VERIFY}"
-          image: 3scale-amp20/apicast-gateway:1.0
+          image: 3scale-amp21/apicast-gateway:1.1
           imagePullPolicy: Always
           name: "${APICAST_NAME}"
           livenessProbe:
@@ -99,7 +99,7 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: 2.0.0-CR2-redhat-1
+  value: 2.1.0-ER1-redhat-1
   required: true
 - description: "Name of the secret containing the THREESCALE_PORTAL_ENDPOINT with the access-token or provider key"
   value: apicast-configuration-url-secret

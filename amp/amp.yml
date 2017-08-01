@@ -94,114 +94,6 @@ metadata:
   name: "system"
 message: "Login on https://${TENANT_NAME}-admin.${WILDCARD_DOMAIN} as ${ADMIN_USERNAME}/${ADMIN_PASSWORD}"
 objects:
-
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    name: amp-system
-    annotations:
-      openshift.io/display-name: AMP System
-  spec:
-    tags:
-    - name: latest
-      annotations:
-        openshift.io/display-name: AMP System (latest)
-      from:
-        kind: ImageStreamTag
-        name: "2.1.0-ER1-redhat-1"
-    - name: "2.1.0-ER1-redhat-1"
-      annotations:
-        openshift.io/display-name: AMP system 2.1.0-ER1-redhat-1
-      from:
-        kind: DockerImage
-        name: 3scale-amp21/system:1.1
-
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    name: amp-backend
-    annotations:
-      openshift.io/display-name: AMP backend
-  spec:
-    tags:
-    - name: latest
-      annotations:
-        openshift.io/display-name: amp-backend (latest)
-      from:
-        kind: ImageStreamTag
-        name: "2.1.0-ER1-redhat-1"
-    - name: "2.1.0-ER1-redhat-1"
-      annotations:
-        openshift.io/display-name: amp-backend 2.1.0-ER1-redhat-1
-      from:
-        kind: DockerImage
-        name: 3scale-amp21/backend:1.1
-
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    name: amp-apicast
-    annotations:
-      openshift.io/display-name: AMP APIcast
-  spec:
-    tags:
-    - name: latest
-      annotations:
-        openshift.io/display-name: AMP APIcast (latest)
-      from:
-        kind: ImageStreamTag
-        name: "2.1.0-ER1-redhat-1"
-    - name: "2.1.0-ER1-redhat-1"
-      annotations:
-        openshift.io/display-name: AMP APIcast 2.1.0-ER1-redhat-1
-      from:
-        kind: DockerImage
-        name: 3scale-amp21/apicast-gateway:1.1
-
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    name: amp-wildcard-router
-    annotations:
-      openshift.io/display-name: AMP APIcast Wildcard Router
-  spec:
-    tags:
-    - name: latest
-      annotations:
-        openshift.io/display-name: AMP APIcast Wildcard Router (latest)
-      from:
-        kind: ImageStreamTag
-        name: "2.1.0-ER1-redhat-1"
-    - name: "2.1.0-ER1-redhat-1"
-      annotations:
-        openshift.io/display-name: AMP APIcast Wildcard Router 2.1.0-ER1-redhat-1
-      from:
-        kind: DockerImage
-        name: 3scale-amp21/wildcard-router:1.1
-
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    name: amp-zync
-    labels:
-      app: zync
-    annotations:
-      openshift.io/display-name: AMP Zync
-  spec:
-    tags:
-    - name: latest
-      annotations:
-        openshift.io/display-name: AMP Zync (latest)
-      from:
-        kind: ImageStreamTag
-        name: "2.1.0-ER1-redhat-1"
-    - name: "2.1.0-ER1-redhat-1"
-      annotations:
-        openshift.io/display-name: AMP Zync 2.1.0-ER1-redhat-1
-      from:
-        kind: DockerImage
-        name: 3scale-amp21/zync:1.1
-
 - apiVersion: "v1"
   kind: "PersistentVolumeClaim"
   metadata:
@@ -277,19 +169,11 @@ objects:
             value: "backend-redis:6379/1"
           - name: RACK_ENV
             value: "production"
-          image: amp-backend:latest
+          image: 3scale-amp21/backend:1.1-1
           imagePullPolicy: Always
           name: backend-cron
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - backend-cron
-        from:
-          kind: ImageStreamTag
-          name: amp-backend:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -386,7 +270,7 @@ objects:
             value: "${SYSTEM_BACKEND_USERNAME}"
           - name: CONFIG_INTERNAL_API_PASSWORD
             value: "${SYSTEM_BACKEND_PASSWORD}"
-          image: amp-backend:latest
+          image: 3scale-amp21/backend:1.1-1
           imagePullPolicy: Always
           name: backend-listener
           livenessProbe:
@@ -405,14 +289,6 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - backend-listener
-        from:
-          kind: ImageStreamTag
-          name: amp-backend:latest
 
 - apiVersion: v1
   kind: Service
@@ -505,19 +381,11 @@ objects:
             value: http://system-provider:3000/master/events/import
           - name: CONFIG_EVENTS_HOOK_SHARED_SECRET
             value: ${SYSTEM_BACKEND_SHARED_SECRET}
-          image: amp-backend:latest
+          image: 3scale-amp21/backend:1.1-1
           imagePullPolicy: Always
           name: backend-worker
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - backend-worker
-        from:
-          kind: ImageStreamTag
-          name: amp-backend:latest
 
 - kind: Service
   apiVersion: v1
@@ -660,7 +528,7 @@ objects:
             value: '5'
           - name: FULL_REINDEX_INTERVAL
             value: '60'
-          image: amp-system:latest
+          image: 3scale-amp21/system:1.1-2
           imagePullPolicy: Always
           name: system-sphinx
           livenessProbe:
@@ -670,14 +538,6 @@ objects:
             periodSeconds: 10
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - system-sphinx
-        from:
-          kind: ImageStreamTag
-          name: amp-system:latest
 
 - apiVersion: v1
   kind: Service
@@ -741,6 +601,23 @@ objects:
           protocol: TCP
     triggers:
     - type: ConfigChange
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: apicast-wildcard-router-route
+    labels:
+      app: apicast-wildcard-router
+  spec:
+    host: apicast-wildcard.${WILDCARD_DOMAIN}
+    to:
+      kind: Service
+      name: apicast-wildcard-router
+    port:
+      targetPort: http
+    wildcardPolicy: ${WILDCARD_POLICY}
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Allow
 
 - apiVersion: v1
   kind: Route
@@ -834,7 +711,7 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/2"
-          image: amp-apicast:latest
+          image: 3scale-amp21/apicast-gateway:1.1-1
           imagePullPolicy: Always
           name: apicast-staging
           livenessProbe:
@@ -858,14 +735,6 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - apicast-staging
-        from:
-          kind: ImageStreamTag
-          name: amp-apicast:latest
 
 - apiVersion: v1
   kind: Service
@@ -925,7 +794,7 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/1"
-          image: amp-apicast:latest
+          image: 3scale-amp21/apicast-gateway:1.1-1
           imagePullPolicy: Always
           name: apicast-production
           livenessProbe:
@@ -949,14 +818,6 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - apicast-production
-        from:
-          kind: ImageStreamTag
-          name: amp-apicast:latest
 
 - apiVersion: v1
   kind: Service
@@ -1038,7 +899,7 @@ objects:
             value: http://system-provider:3000
           - name: ACCESS_TOKEN
             value: "${APICAST_ACCESS_TOKEN}"
-          image: amp-wildcard-router:latest
+          image: 3scale-amp21/wildcard-router:1.1-2
           imagePullPolicy: Always
           name: apicast-wildcard-router
           ports:
@@ -1052,14 +913,6 @@ objects:
               port: http
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - apicast-wildcard-router
-        from:
-          kind: ImageStreamTag
-          name: amp-wildcard-router:latest
 
 - apiVersion: v1
   kind: Service
@@ -1073,24 +926,6 @@ objects:
       name: http
     selector:
       deploymentconfig: apicast-wildcard-router
-
-- apiVersion: v1
-  kind: Route
-  metadata:
-    name: apicast-wildcard-router-route
-    labels:
-      app: apicast-wildcard-router
-  spec:
-    host: apicast-${TENANT_NAME}.${WILDCARD_DOMAIN}
-    to:
-      kind: Service
-      name: apicast-wildcard-router
-    port:
-      targetPort: http
-    wildcardPolicy: Subdomain
-    tls:
-      termination: edge
-      insecureEdgeTerminationPolicy: Allow
 
 - kind: ConfigMap
   apiVersion: v1
@@ -1169,7 +1004,7 @@ objects:
         containers:
         - args:
           env: *base_env
-          image: amp-system:latest
+          image: 3scale-amp21/system:1.1-2
           imagePullPolicy: Always
           command: ['env', 'TENANT_MODE=provider', 'PORT=3000', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
           name: system-provider
@@ -1205,7 +1040,7 @@ objects:
             subPath: rolling_updates.yml
         - args:
           env: *base_env
-          image: amp-system:latest
+          image: 3scale-amp21/system:1.1-2
           command: ['env', 'TENANT_MODE=developer', 'PORT=3001', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
           imagePullPolicy: Always
           name: system-developer
@@ -1254,15 +1089,6 @@ objects:
               path: rolling_updates.yml
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - system-provider
-        - system-developer
-        from:
-          kind: ImageStreamTag
-          name: amp-system:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -1291,7 +1117,7 @@ objects:
           - 'resque:work'
           - 'QUEUE=*'
           env: *base_env
-          image: amp-system:latest
+          image: 3scale-amp21/system:1.1-2
           imagePullPolicy: Always
           name: system-resque
           volumeMounts:
@@ -1302,7 +1128,7 @@ objects:
           - 'resque:scheduler'
           - 'QUEUE=*'
           env: *base_env
-          image: amp-system:latest
+          image: 3scale-amp21/system:1.1-2
           imagePullPolicy: Always
           name: system-scheduler
         volumes:
@@ -1311,15 +1137,6 @@ objects:
             claimName: system-storage
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - system-scheduler
-        - system-resque
-        from:
-          kind: ImageStreamTag
-          name: amp-system:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -1347,7 +1164,7 @@ objects:
           - rake
           - sidekiq:worker
           env: *base_env
-          image: amp-system:latest
+          image: 3scale-amp21/system:1.1-2
           imagePullPolicy: Always
           name: system-sidekiq
           volumeMounts:
@@ -1373,14 +1190,6 @@ objects:
               path: rolling_updates.yml
     triggers:
     - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - system-sidekiq
-        from:
-          kind: ImageStreamTag
-          name: amp-system:latest
 
 - kind: DeploymentConfig
   apiVersion: v1
@@ -1543,7 +1352,7 @@ objects:
           deploymentconfig: zync
       spec:
         containers:
-        - image: " "
+        - image: 3scale-amp21/zync:1.1-1
           name: zync
           ports:
           - containerPort: 8080
@@ -1597,14 +1406,6 @@ objects:
             failureThreshold: 3
     triggers:
     - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - zync
-        from:
-          kind: ImageStreamTag
-          name: amp-zync:latest
-      type: ImageChange
 
 - apiVersion: v1
   kind: Service
@@ -1737,6 +1538,10 @@ parameters:
 - name: WILDCARD_DOMAIN
   description: Root domain for the wildcard routes. Eg. example.com will generate 3scale-admin.example.com.
   required: true
+- name: WILDCARD_POLICY
+  description: Use "subdomain" to create a wildcard route for apicast wildcard router
+  required: true
+  value: "None"
 - name: TENANT_NAME
   description: "Tenant name under the root that Admin UI will be available with -admin suffix."
   required: true

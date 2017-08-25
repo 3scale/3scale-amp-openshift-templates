@@ -42,7 +42,7 @@ base_env: &base_env
 - name: SECRET_KEY_BASE
   value: "${SYSTEM_APP_SECRET_KEY_BASE}"
 - name: AMP_RELEASE
-  value: "${AMP_RELEASE}"
+  value: "2.1.0-ER2-redhat-1"
 - name: ZYNC_AUTHENTICATION_TOKEN
   valueFrom:
     secretKeyRef:
@@ -94,13 +94,121 @@ metadata:
   name: "system"
 message: "Login on https://${TENANT_NAME}-admin.${WILDCARD_DOMAIN} as ${ADMIN_USERNAME}/${ADMIN_PASSWORD}"
 objects:
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-system
+    annotations:
+      openshift.io/display-name: AMP System
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP System (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER2-redhat-1"
+    - name: "2.1.0-ER2-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP system 2.1.0-ER2-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/system:1.2-1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-backend
+    annotations:
+      openshift.io/display-name: AMP backend
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: amp-backend (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER2-redhat-1"
+    - name: "2.1.0-ER2-redhat-1"
+      annotations:
+        openshift.io/display-name: amp-backend 2.1.0-ER2-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/backend:1.2-1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-apicast
+    annotations:
+      openshift.io/display-name: AMP APIcast
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP APIcast (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER2-redhat-1"
+    - name: "2.1.0-ER2-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP APIcast 2.1.0-ER2-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/apicast-gateway:1.2-1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-wildcard-router
+    annotations:
+      openshift.io/display-name: AMP APIcast Wildcard Router
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP APIcast Wildcard Router (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER2-redhat-1"
+    - name: "2.1.0-ER2-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP APIcast Wildcard Router 2.1.0-ER2-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/wildcard-router:1.2-1
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: amp-zync
+    labels:
+      app: zync
+    annotations:
+      openshift.io/display-name: AMP Zync
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: AMP Zync (latest)
+      from:
+        kind: ImageStreamTag
+        name: "2.1.0-ER2-redhat-1"
+    - name: "2.1.0-ER2-redhat-1"
+      annotations:
+        openshift.io/display-name: AMP Zync 2.1.0-ER2-redhat-1
+      from:
+        kind: DockerImage
+        name: 3scale-amp21/zync:1.2-1
+
 - apiVersion: "v1"
   kind: "PersistentVolumeClaim"
   metadata:
     name: "system-storage"
   spec:
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     resources:
       requests:
         storage: "100Mi"
@@ -111,7 +219,7 @@ objects:
     name: "mysql-storage"
   spec:
     accessModes:
-    - "ReadWriteOnce"
+      - "ReadWriteOnce"
     resources:
       requests:
         storage: "1Gi"
@@ -122,7 +230,7 @@ objects:
     name: "system-redis-storage"
   spec:
     accessModes:
-    - "ReadWriteOnce"
+      - "ReadWriteOnce"
     resources:
       requests:
         storage: "1Gi"
@@ -133,7 +241,7 @@ objects:
     name: "backend-redis-storage"
   spec:
     accessModes:
-    - "ReadWriteOnce"
+      - "ReadWriteOnce"
     resources:
       requests:
         storage: "1Gi"
@@ -169,11 +277,19 @@ objects:
             value: "backend-redis:6379/1"
           - name: RACK_ENV
             value: "production"
-          image: 3scale-amp21/backend:1.1-1
+          image: amp-backend:latest
           imagePullPolicy: Always
           name: backend-cron
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - backend-cron
+        from:
+          kind: ImageStreamTag
+          name: amp-backend:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -197,10 +313,10 @@ objects:
           readinessProbe:
             exec:
               command:
-              - "container-entrypoint"
-              - "bash"
-              - "-c"
-              - "redis-cli set liveness-probe \"`date`\" | grep OK"
+                - "container-entrypoint"
+                - "bash"
+                - "-c"
+                - "redis-cli set liveness-probe \"`date`\" | grep OK"
             initialDelaySeconds: 10
             periodSeconds: 30
             timeoutSeconds: 1
@@ -270,7 +386,7 @@ objects:
             value: "${SYSTEM_BACKEND_USERNAME}"
           - name: CONFIG_INTERNAL_API_PASSWORD
             value: "${SYSTEM_BACKEND_PASSWORD}"
-          image: 3scale-amp21/backend:1.1-1
+          image: amp-backend:latest
           imagePullPolicy: Always
           name: backend-listener
           livenessProbe:
@@ -289,6 +405,14 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - backend-listener
+        from:
+          kind: ImageStreamTag
+          name: amp-backend:latest
 
 - apiVersion: v1
   kind: Service
@@ -381,11 +505,19 @@ objects:
             value: http://system-provider:3000/master/events/import
           - name: CONFIG_EVENTS_HOOK_SHARED_SECRET
             value: ${SYSTEM_BACKEND_SHARED_SECRET}
-          image: 3scale-amp21/backend:1.1-1
+          image: amp-backend:latest
           imagePullPolicy: Always
           name: backend-worker
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - backend-worker
+        from:
+          kind: ImageStreamTag
+          name: amp-backend:latest
 
 - kind: Service
   apiVersion: v1
@@ -393,13 +525,14 @@ objects:
     name: 'system-mysql'
   spec:
     ports:
-    - name: system-mysql
-      protocol: TCP
-      port: 3306
-      targetPort: 3306
-      nodePort: 0
+      - name: system-mysql
+        protocol: TCP
+        port: 3306
+        targetPort: 3306
+        nodePort: 0
     selector:
       name: 'system-mysql'
+
 - apiVersion: v1
   kind: Service
   metadata:
@@ -412,7 +545,6 @@ objects:
       name: redis
     selector:
       name: system-redis
-
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -444,10 +576,10 @@ objects:
           readinessProbe:
             exec:
               command:
-              - "container-entrypoint"
-              - "bash"
-              - "-c"
-              - "redis-cli set liveness-probe \"`date`\" | grep OK"
+                - "container-entrypoint"
+                - "bash"
+                - "-c"
+                - "redis-cli set liveness-probe \"`date`\" | grep OK"
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
@@ -508,8 +640,8 @@ objects:
           emptyDir: {}
         containers:
         - args:
-          - rake
-          - 'openshift:thinking_sphinx:start'
+            - rake
+            - 'openshift:thinking_sphinx:start'
           volumeMounts:
           - name: system-sphinx-database
             mountPath: "/opt/system/db/sphinx"
@@ -528,7 +660,7 @@ objects:
             value: '5'
           - name: FULL_REINDEX_INTERVAL
             value: '60'
-          image: 3scale-amp21/system:1.1-2
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-sphinx
           livenessProbe:
@@ -537,7 +669,15 @@ objects:
             initialDelaySeconds: 60
             periodSeconds: 10
     triggers:
-    - type: ConfigChange
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - system-sphinx
+          from:
+            kind: ImageStreamTag
+            name: amp-system:latest
 
 - apiVersion: v1
   kind: Service
@@ -581,9 +721,9 @@ objects:
           readinessProbe:
             exec:
               command:
-              - "sh"
-              - "-c"
-              - "echo version | nc $HOSTNAME 11211 | grep VERSION"
+                - "sh"
+                - "-c"
+                - "echo version | nc $HOSTNAME 11211 | grep VERSION"
             initialDelaySeconds: 10
             periodSeconds: 30
             timeoutSeconds: 5
@@ -593,31 +733,14 @@ objects:
             initialDelaySeconds: 10
             periodSeconds: 10
           command:
-          - "memcached"
-          - "-m"
-          - "64"
+            - "memcached"
+            - "-m"
+            - "64"
         ports:
         - containerPort: 6379
           protocol: TCP
     triggers:
     - type: ConfigChange
-- apiVersion: v1
-  kind: Route
-  metadata:
-    name: apicast-wildcard-router-route
-    labels:
-      app: apicast-wildcard-router
-  spec:
-    host: apicast-wildcard.${WILDCARD_DOMAIN}
-    to:
-      kind: Service
-      name: apicast-wildcard-router
-    port:
-      targetPort: http
-    wildcardPolicy: ${WILDCARD_POLICY}
-    tls:
-      termination: edge
-      insecureEdgeTerminationPolicy: Allow
 
 - apiVersion: v1
   kind: Route
@@ -711,7 +834,7 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/2"
-          image: 3scale-amp21/apicast-gateway:1.1-1
+          image: amp-apicast:latest
           imagePullPolicy: Always
           name: apicast-staging
           livenessProbe:
@@ -735,6 +858,14 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - apicast-staging
+        from:
+          kind: ImageStreamTag
+          name: amp-apicast:latest
 
 - apiVersion: v1
   kind: Service
@@ -794,7 +925,7 @@ objects:
             value: '${APICAST_RESPONSE_CODES}'
           - name: REDIS_URL
             value: "redis://system-redis:6379/1"
-          image: 3scale-amp21/apicast-gateway:1.1-1
+          image: amp-apicast:latest
           imagePullPolicy: Always
           name: apicast-production
           livenessProbe:
@@ -818,6 +949,14 @@ objects:
             protocol: TCP
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - apicast-production
+        from:
+          kind: ImageStreamTag
+          name: amp-apicast:latest
 
 - apiVersion: v1
   kind: Service
@@ -894,25 +1033,33 @@ objects:
           deploymentconfig: apicast-wildcard-router
       spec:
         containers:
-        - env:
-          - name: API_HOST
-            value: http://system-provider:3000
-          - name: ACCESS_TOKEN
-            value: "${APICAST_ACCESS_TOKEN}"
-          image: 3scale-amp21/wildcard-router:1.1-2
-          imagePullPolicy: Always
-          name: apicast-wildcard-router
-          ports:
-          - containerPort: 8080
-            protocol: TCP
-            name: http
-          livenessProbe:
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            tcpSocket:
-              port: http
+          - env:
+            - name: API_HOST
+              value: http://system-provider:3000
+            - name: ACCESS_TOKEN
+              value: "${APICAST_ACCESS_TOKEN}"
+            image: amp-wildcard-router:latest
+            imagePullPolicy: Always
+            name: apicast-wildcard-router
+            ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: http
+            livenessProbe:
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              tcpSocket:
+                port: http
     triggers:
     - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - apicast-wildcard-router
+        from:
+          kind: ImageStreamTag
+          name: amp-wildcard-router:latest
 
 - apiVersion: v1
   kind: Service
@@ -926,6 +1073,24 @@ objects:
       name: http
     selector:
       deploymentconfig: apicast-wildcard-router
+
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: apicast-wildcard-router-route
+    labels:
+      app: apicast-wildcard-router
+  spec:
+    host: apicast-wildcard.${WILDCARD_DOMAIN}
+    to:
+      kind: Service
+      name: apicast-wildcard-router
+    port:
+      targetPort: http
+    wildcardPolicy: ${WILDCARD_POLICY}
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Allow
 
 - kind: ConfigMap
   apiVersion: v1
@@ -960,7 +1125,6 @@ objects:
         forum: false
         published_service_plan_signup: true
         apicast_oidc: true
-
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -1004,9 +1168,9 @@ objects:
         containers:
         - args:
           env: *base_env
-          image: 3scale-amp21/system:1.1-2
+          image: amp-system:latest
           imagePullPolicy: Always
-          command: ['env', 'TENANT_MODE=provider', 'PORT=3000', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
+          command: [ 'env', 'TENANT_MODE=provider', 'PORT=3000', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb' ]
           name: system-provider
           livenessProbe:
             timeoutSeconds: 10
@@ -1040,8 +1204,8 @@ objects:
             subPath: rolling_updates.yml
         - args:
           env: *base_env
-          image: 3scale-amp21/system:1.1-2
-          command: ['env', 'TENANT_MODE=developer', 'PORT=3001', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb']
+          image: amp-system:latest
+          command: [ 'env', 'TENANT_MODE=developer', 'PORT=3001', 'container-entrypoint', 'bundle', 'exec', 'unicorn', '-c', 'config/unicorn.rb' ]
           imagePullPolicy: Always
           name: system-developer
           livenessProbe:
@@ -1088,7 +1252,16 @@ objects:
             - key: rolling_updates.yml
               path: rolling_updates.yml
     triggers:
-    - type: ConfigChange
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - system-provider
+          - system-developer
+          from:
+            kind: ImageStreamTag
+            name: amp-system:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
@@ -1113,22 +1286,22 @@ objects:
       spec:
         containers:
         - args:
-          - 'rake'
-          - 'resque:work'
-          - 'QUEUE=*'
+            - 'rake'
+            - 'resque:work'
+            - 'QUEUE=*'
           env: *base_env
-          image: 3scale-amp21/system:1.1-2
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-resque
           volumeMounts:
-          - name: system-storage
-            mountPath: /opt/system/public/system
+                    - name: system-storage
+                      mountPath: /opt/system/public/system
         - args:
-          - 'rake'
-          - 'resque:scheduler'
-          - 'QUEUE=*'
+            - 'rake'
+            - 'resque:scheduler'
+            - 'QUEUE=*'
           env: *base_env
-          image: 3scale-amp21/system:1.1-2
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-scheduler
         volumes:
@@ -1136,16 +1309,25 @@ objects:
           persistentVolumeClaim:
             claimName: system-storage
     triggers:
-    - type: ConfigChange
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - system-scheduler
+          - system-resque
+          from:
+            kind: ImageStreamTag
+            name: amp-system:latest
 
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
-    name: system-sidekiq
+    name:  system-sidekiq
   spec:
     replicas: 1
     selector:
-      name: system-sidekiq
+      name:  system-sidekiq
     strategy:
       rollingParams:
         intervalSeconds: 1
@@ -1157,14 +1339,14 @@ objects:
     template:
       metadata:
         labels:
-          name: system-sidekiq
+          name:  system-sidekiq
       spec:
         containers:
         - args:
           - rake
           - sidekiq:worker
           env: *base_env
-          image: 3scale-amp21/system:1.1-2
+          image: amp-system:latest
           imagePullPolicy: Always
           name: system-sidekiq
           volumeMounts:
@@ -1189,7 +1371,15 @@ objects:
             - key: rolling_updates.yml
               path: rolling_updates.yml
     triggers:
-    - type: ConfigChange
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - system-sidekiq
+          from:
+            kind: ImageStreamTag
+            name: amp-system:latest
 
 - kind: DeploymentConfig
   apiVersion: v1
@@ -1199,7 +1389,7 @@ objects:
     strategy:
       type: Recreate
     triggers:
-    - type: ConfigChange
+      - type: ConfigChange
     replicas: 1
     selector:
       name: 'system-mysql'
@@ -1209,51 +1399,53 @@ objects:
           name: 'system-mysql'
       spec:
         containers:
-        - name: system-mysql
-          image: ${MYSQL_IMAGE}
-          ports:
-          - containerPort: 3306
-            protocol: TCP
-          resources:
-            limits:
-              memory: 2Gi
-            requests:
-              cpu: '1'
-              memory: 1Gi
-          readinessProbe:
-            timeoutSeconds: 5
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            exec:
-              command:
-              - /bin/sh
-              - '-i'
-              - '-c'
-              - MYSQL_PWD="$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'
-          livenessProbe:
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            tcpSocket:
-              port: 3306
-          env:
-          - name: MYSQL_USER
-            value: ${MYSQL_USER}
-          - name: MYSQL_PASSWORD
-            value: ${MYSQL_PASSWORD}
-          - name: MYSQL_DATABASE
-            value: ${MYSQL_DATABASE}
-          - name: MYSQL_ROOT_PASSWORD
-            value: ${MYSQL_ROOT_PASSWORD}
-          - name: MYSQL_LOWER_CASE_TABLE_NAMES
-            value: "1"
-          volumeMounts:
-          - name: 'mysql-storage'
-            mountPath: /var/lib/mysql/data
-          imagePullPolicy: Always
+          - name: system-mysql
+            image: ${MYSQL_IMAGE}
+            ports:
+              - containerPort: 3306
+                protocol: TCP
+            resources:
+              limits:
+                memory: 2Gi
+              requests:
+                cpu: '1'
+                memory: 1Gi
+            readinessProbe:
+              timeoutSeconds: 5
+              initialDelaySeconds: 10
+              periodSeconds: 30
+              exec:
+                command:
+                  - /bin/sh
+                  - '-i'
+                  - '-c'
+                  - >-
+                    MYSQL_PWD="$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u
+                    $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'
+            livenessProbe:
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              tcpSocket:
+                port: 3306
+            env:
+              - name: MYSQL_USER
+                value: ${MYSQL_USER}
+              - name: MYSQL_PASSWORD
+                value: ${MYSQL_PASSWORD}
+              - name: MYSQL_DATABASE
+                value: ${MYSQL_DATABASE}
+              - name: MYSQL_ROOT_PASSWORD
+                value: ${MYSQL_ROOT_PASSWORD}
+              - name: MYSQL_LOWER_CASE_TABLE_NAMES
+                value: "1"
+            volumeMounts:
+              - name: 'mysql-storage'
+                mountPath: /var/lib/mysql/data
+            imagePullPolicy: Always
         volumes:
-        - name: 'mysql-storage'
-          persistentVolumeClaim:
-            claimName: 'mysql-storage'
+          - name: 'mysql-storage'
+            persistentVolumeClaim:
+              claimName: 'mysql-storage'
 
 - kind: ConfigMap
   apiVersion: v1
@@ -1321,6 +1513,17 @@ objects:
     authentication: ""
     openssl.verify.mode: ""
 
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: postgresql
+  spec:
+    tags:
+      - name: '9.5'
+        from:
+          kind: DockerImage
+          name: rhscl/postgresql-95-rhel7:9.5
+
 - kind: Secret
   apiVersion: v1
   stringData:
@@ -1352,7 +1555,7 @@ objects:
           deploymentconfig: zync
       spec:
         containers:
-        - image: 3scale-amp21/zync:1.1-1
+        - image: " "
           name: zync
           ports:
           - containerPort: 8080
@@ -1365,25 +1568,25 @@ objects:
               cpu: 250m
               memory: 150M
           env:
-          - name: RAILS_LOG_TO_STDOUT
-            value: 'true'
-          - name: RAILS_ENV
-            value: production
-          - name: DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: zync
-                key: DATABASE_URL
-          - name: SECRET_KEY_BASE
-            valueFrom:
-              secretKeyRef:
-                name: zync
-                key: SECRET_KEY_BASE
-          - name: ZYNC_AUTHENTICATION_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: zync
-                key: ZYNC_AUTHENTICATION_TOKEN
+            - name: RAILS_LOG_TO_STDOUT
+              value: 'true'
+            - name: RAILS_ENV
+              value: production
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: zync
+                  key: DATABASE_URL
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: zync
+                  key: SECRET_KEY_BASE
+            - name: ZYNC_AUTHENTICATION_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: zync
+                  key: ZYNC_AUTHENTICATION_TOKEN
           livenessProbe:
             httpGet:
               path: /status/live
@@ -1406,6 +1609,14 @@ objects:
             failureThreshold: 3
     triggers:
     - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - zync
+        from:
+          kind: ImageStreamTag
+          name: amp-zync:latest
+      type: ImageChange
 
 - apiVersion: v1
   kind: Service
@@ -1446,6 +1657,14 @@ objects:
     strategy:
       type: Recreate
     triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - postgresql
+        from:
+          kind: ImageStreamTag
+          name: postgresql:9.5
     - type: ConfigChange
     replicas: 1
     selector:
@@ -1457,7 +1676,7 @@ objects:
       spec:
         containers:
         - name: postgresql
-          image: "rhscl/postgresql-95-rhel7:9.5"
+          image: " "
           ports:
           - containerPort: 5432
             protocol: TCP
@@ -1516,7 +1735,7 @@ parameters:
   required: true
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: "2.1.0-ER1-redhat-1"
+  value: "2.1.0-ER2-redhat-1"
   required: true
 - name: ADMIN_PASSWORD
   required: true
@@ -1539,7 +1758,7 @@ parameters:
   description: Root domain for the wildcard routes. Eg. example.com will generate 3scale-admin.example.com.
   required: true
 - name: WILDCARD_POLICY
-  description: Use "subdomain" to create a wildcard route for apicast wildcard router
+  description: Use "Subdomain" to create a wildcard route for apicast wildcard router
   required: true
   value: "None"
 - name: TENANT_NAME
@@ -1580,11 +1799,11 @@ parameters:
 - name: REDIS_IMAGE
   description: Redis image to use
   required: true
-  value: "rhscl/redis-32-rhel7:3.2-5.10"
+  value: "rhscl/redis-32-rhel7:3.2"
 - name: MYSQL_IMAGE
   description: Mysql image to use
   required: true
-  value: "rhscl/mysql-56-rhel7:5.6-13.19"
+  value: "rhscl/mysql-56-rhel7:5.6"
 - name: SYSTEM_BACKEND_SHARED_SECRET
   description: Shared secret to import events from backend to system.
   generate: expression

@@ -87,6 +87,22 @@ base_env: &base_env
   value: "https://backend-${TENANT_NAME}.${WILDCARD_DOMAIN}"
 - name: SSL_CERT_DIR
   value: "/etc/pki/tls/certs"
+- name: FILE_UPLOAD_STORAGE
+  value: "${FILE_UPLOAD_STORAGE}"
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: aws-auth
+      key: AWS_ACCESS_KEY_ID
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: aws-auth
+      key: AWS_SECRET_ACCESS_KEY
+- name: AWS_BUCKET
+  value: "${AWS_BUCKET}"
+- name: AWS_REGION
+  value: "${AWS_REGION}"
 
 apiVersion: v1
 kind: Template
@@ -201,18 +217,6 @@ objects:
       from:
         kind: DockerImage
         name: 3scale-amp21/zync:1.2-1
-
-- apiVersion: "v1"
-  kind: "PersistentVolumeClaim"
-  metadata:
-    name: "system-storage"
-  spec:
-    accessModes:
-      - "ReadWriteMany"
-    resources:
-      requests:
-        storage: "100Mi"
-
 - apiVersion: "v1"
   kind: "PersistentVolumeClaim"
   metadata:
@@ -1149,8 +1153,7 @@ objects:
             - -c
             - bundle exec rake boot openshift:deploy
             env: *base_env
-            volumes:
-            - system-storage
+            volumes: []
         post:
           failurePolicy: Abort
           execNewPod:
@@ -1194,8 +1197,6 @@ objects:
             protocol: TCP
             name: provider
           volumeMounts:
-          - name: system-storage
-            mountPath: /opt/system/public/system
           - name: system-config
             mountPath: /opt/system/config/zync.yml
             subPath: zync.yml
@@ -1230,9 +1231,6 @@ objects:
             protocol: TCP
             name: developer
           volumeMounts:
-          - name: system-storage
-            mountPath: /opt/system/public/system
-            readOnly: true
           - name: system-config
             mountPath: /opt/system/config/zync.yml
             subPath: zync.yml
@@ -1240,9 +1238,6 @@ objects:
             mountPath: /opt/system/config/rolling_updates.yml
             subPath: rolling_updates.yml
         volumes:
-        - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
         - name: system-config
           configMap:
             name: system
@@ -1293,9 +1288,7 @@ objects:
           image: amp-system:latest
           imagePullPolicy: Always
           name: system-resque
-          volumeMounts:
-                    - name: system-storage
-                      mountPath: /opt/system/public/system
+          volumeMounts: []
         - args:
             - 'rake'
             - 'resque:scheduler'
@@ -1304,10 +1297,7 @@ objects:
           image: amp-system:latest
           imagePullPolicy: Always
           name: system-scheduler
-        volumes:
-        - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
+        volumes: []
     triggers:
       - type: ConfigChange
       - type: ImageChange
@@ -1350,8 +1340,6 @@ objects:
           imagePullPolicy: Always
           name: system-sidekiq
           volumeMounts:
-          - name: system-storage
-            mountPath: /opt/system/public/system
           - name: system-config
             mountPath: /opt/system/config/zync.yml
             subPath: zync.yml
@@ -1359,9 +1347,6 @@ objects:
             mountPath: /opt/system/config/rolling_updates.yml
             subPath: rolling_updates.yml
         volumes:
-        - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
         - name: system-config
           configMap:
             name: system
@@ -1825,4 +1810,19 @@ parameters:
 - name: APICAST_RESPONSE_CODES
   description: "Enable logging response codes in APIcast."
   value: "true"
+  required: false
+- name: FILE_UPLOAD_STORAGE
+  description: Define Assets Storage
+  required: false
+- name: AWS_ACCESS_KEY_ID
+  description: AWS Access Key ID to use in S3 Storage for assets.
+  required: false
+- name: AWS_SECRET_ACCESS_KEY
+  description: AWS Access Key Secret to use in S3 Storage for assets.
+  required: false
+- name: AWS_BUCKET
+  description: AWS S3 Bucket Name to use in S3 Storage for assets.
+  required: false
+- name: AWS_REGION
+  description: AWS Region to use in S3 Storage for assets.
   required: false

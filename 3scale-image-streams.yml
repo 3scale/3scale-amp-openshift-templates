@@ -1,0 +1,37 @@
+kind: ImageStreamList
+apiVersion: v1
+metadata: {}
+items:
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "apicast-gateway"
+    annotations:
+      openshift.io/display-name: "3scale APIcast API Gateway"
+  spec:
+    tags:
+    - name: latest
+      annotations:
+        openshift.io/display-name: "3scale APIcast API Gateway (latest)" 
+        openshift.io/provider-display-name: "Red Hat, Inc."
+        iconClass: "icon-3scale"
+        description: >- 
+          "3scale's APIcast API Gateway is an OpenResty application which consists of two parts: 
+          Nginx configuration and Lua files.\n\nWARNING: By selecting this tag, your application 
+          will automatically update to use the latest version of Httpd available on OpenShift, 
+          including major versions updates."
+        tags: "api,gateway,3scale"
+      from:
+        kind: ImageStreamTag
+        name: '1.4-2'
+    - name: '1.4-2'
+      annotations:
+        openshift.io/display-name: "3scale APIcast API Gateway (latest)" 
+        openshift.io/provider-display-name: "Red Hat, Inc."
+        iconClass: "icon-3scale"
+        description: "3scale's APIcast API Gateway is an OpenResty application which consists of two parts: Nginx configuration and Lua files."
+        tags: "api,gateway,3scale"
+        version: '1.4-2'
+      from:
+        kind: DockerImage
+        name: registry.access.redhat.com/3scale-amp21/apicast-gateway:1.4-2 

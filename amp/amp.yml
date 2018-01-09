@@ -1,4 +1,6 @@
 base_env: &base_env
+- name: AMP_RELEASE
+  value: "${AMP_RELEASE}"
 - name: RAILS_ENV
   value: "production"
 - name: DATABASE_URL
@@ -1820,3 +1822,6 @@ parameters:
   description: "Enable logging response codes in APIcast."
   value: "true"
   required: false
+- name: AMP_RELEASE
+  description: "AMP release tag."
+  value: 2.1.0-GA

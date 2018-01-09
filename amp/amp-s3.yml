@@ -1,4 +1,6 @@
 base_env: &base_env
+- name: AMP_RELEASE
+  value: "${AMP_RELEASE}"
 - name: RAILS_ENV
   value: "production"
 - name: DATABASE_URL
@@ -1829,3 +1831,6 @@ parameters:
 - name: AWS_REGION
   description: AWS Region to use in S3 Storage for assets.
   required: false
+- name: AMP_RELEASE
+  description: "AMP release tag."
+  value: 2.1.0-GA

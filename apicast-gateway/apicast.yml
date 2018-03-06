@@ -9,7 +9,7 @@ metadata:
     iconClass: icon-3scale
     description: >-
       3scale's APIcast is an NGINX based API gateway used to integrate your internal and external 
-      API services with 3scale’s API Management Platform. It supports OpenID connect to integrate 
+      API services with 3scale's API Management Platform. It supports OpenID connect to integrate 
       with external Identity Providers such as Red Hat Single Sign On, for API traffic authentication 
     tags: api,gateway,3scale
 objects:
@@ -19,7 +19,7 @@ objects:
   metadata:
     name: "${APICAST_NAME}"
   spec:
-    replicas: 2
+    replicas: 1
     selector:
       deploymentconfig: "${APICAST_NAME}"
     strategy:
@@ -60,7 +60,7 @@ objects:
             value: "${MANAGEMENT_API}"
           - name: OPENSSL_VERIFY
             value: "${OPENSSL_VERIFY}"
-          image: 3scale-amp21/apicast-gateway:1.4-2
+          image: "apicast-gateway:${AMP_RELEASE}"
           imagePullPolicy: Always
           name: "${APICAST_NAME}"
           livenessProbe:
@@ -82,6 +82,13 @@ objects:
           - name: management
             containerPort: 8090
             protocol: TCP
+            resources:
+              limits:
+                  cpu: '1'
+                  memory: 128Mi
+              requests:
+                  cpu: 500m
+                  memory: 64Mi
     triggers:
     - type: ConfigChange
 
@@ -105,7 +112,7 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: 2.1.0-CR2-redhat-1
+  value: "2.0.1.GA"
   required: true
 - description: "Name of the secret containing the THREESCALE_PORTAL_ENDPOINT with the access-token or provider key"
   value: apicast-configuration-url-secret

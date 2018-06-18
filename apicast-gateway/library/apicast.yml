@@ -101,6 +101,7 @@ objects:
         from:
           kind: ImageStreamTag
           name: apicast-gateway:latest
+          namespace: openshift
 
 - apiVersion: v1
   kind: Service

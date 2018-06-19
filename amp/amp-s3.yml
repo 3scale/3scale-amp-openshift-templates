@@ -210,17 +210,6 @@ objects:
 - apiVersion: "v1"
   kind: "PersistentVolumeClaim"
   metadata:
-    name: "system-storage"
-  spec:
-    accessModes:
-      - "ReadWriteMany"
-    resources:
-      requests:
-        storage: "100Mi"
-
-- apiVersion: "v1"
-  kind: "PersistentVolumeClaim"
-  metadata:
     name: "mysql-storage"
   spec:
     accessModes:
@@ -1330,8 +1319,7 @@ objects:
             - -c
             - bundle exec rake boot openshift:deploy MASTER_ACCESS_TOKEN="${MASTER_ACCESS_TOKEN}"
             env: *base_env
-            volumes:
-            - system-storage
+            volumes: []
         post:
           failurePolicy: Abort
           execNewPod:
@@ -1381,8 +1369,6 @@ objects:
             protocol: TCP
             name: master
           volumeMounts:
-          - name: system-storage
-            mountPath: /opt/system/public/system
           - name: system-config
             mountPath: /opt/system-extra-configs
         - env: *base_env
@@ -1419,8 +1405,6 @@ objects:
             protocol: TCP
             name: provider
           volumeMounts:
-          - name: system-storage
-            mountPath: /opt/system/public/system
           - name: system-config
             mountPath: /opt/system-extra-configs
         - env: *base_env
@@ -1457,15 +1441,9 @@ objects:
             protocol: TCP
             name: developer
           volumeMounts:
-          - name: system-storage
-            mountPath: /opt/system/public/system
-            readOnly: true
           - name: system-config
             mountPath: /opt/system-extra-configs
         volumes:
-        - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
         - name: system-config
           configMap:
             name: system
@@ -1526,9 +1504,7 @@ objects:
             requests:
               cpu: 100m
               memory: 300Mi
-          volumeMounts:
-                    - name: system-storage
-                      mountPath: /opt/system/public/system
+          volumeMounts: []
         - args:
             - 'rake'
             - 'resque:scheduler'
@@ -1544,10 +1520,7 @@ objects:
             requests:
               cpu: 50m
               memory: 200Mi
-        volumes:
-        - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
+        volumes: []
     triggers:
       - type: ConfigChange
       - type: ImageChange
@@ -1601,17 +1574,12 @@ objects:
           volumeMounts:
           - name: system-tmp
             mountPath: "/tmp"
-          - name: system-storage
-            mountPath: /opt/system/public/system
           - name: system-config
             mountPath: /opt/system-extra-configs
         volumes:
         - name: system-tmp
           emptyDir:
             medium: Memory
-        - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
         - name: system-config
           configMap:
             name: system

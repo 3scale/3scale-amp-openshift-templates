@@ -828,7 +828,7 @@ objects:
         containers:
         - args:
           env:
-          image: 3scale-amp20/memcached:1.4.15-8
+          image: 3scale-amp20/memcached:1.4.15-13
           imagePullPolicy: IfNotPresent
           name: memcache
           resources:

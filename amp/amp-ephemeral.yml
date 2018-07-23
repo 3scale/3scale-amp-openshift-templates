@@ -206,65 +206,6 @@ objects:
         name: registry.access.redhat.com/3scale-amp22/wildcard-router:1.6
 
 - apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: system-storage
-    labels:
-      application: 3scale-amp
-      service: system
-      system: app
-  spec:
-    accessModes:
-      - ReadWriteMany
-    resources:
-      requests:
-        storage: 100Mi
-
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: mysql-storage
-    labels:
-      application: 3scale-amp
-      service: system
-      system: mysql
-  spec:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: 1Gi
-
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: system-redis-storage
-    labels:
-      application: 3scale-amp
-      service: system
-      system: redis
-  spec:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: 1Gi
-
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: backend-redis-storage
-    labels:
-      application: 3scale-amp
-      service: backend
-      backend: redis
-  spec:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: 1Gi
-- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     name: backend-cron
@@ -400,8 +341,7 @@ objects:
             mountPath: /etc/redis.d/
         volumes:
         - name: backend-redis-storage
-          persistentVolumeClaim:
-            claimName: backend-redis-storage
+          emptyDir: {}
         - name: redis-config
           configMap:
             name: redis-config
@@ -767,8 +707,7 @@ objects:
             periodSeconds: 5
         volumes:
         - name: system-redis-storage
-          persistentVolumeClaim:
-            claimName: system-redis-storage
+          emptyDir: {}
         - name: redis-config
           configMap:
             name: redis-config
@@ -828,8 +767,8 @@ objects:
           emptyDir: {}
         initContainers:
         - name: zync-svc
-          image: busybox:latest
-          command: ['sh', '-c', 'until $(curl --output /dev/null --silent --head --fail http://zync:8080/status/ready); do sleep $SLEEP_SECONDS; done']
+          image: busybox
+          command: ['sh', '-c', 'until $(wget -qO /dev/null http://zync:8080/status/ready); do sleep $SLEEP_SECONDS; done']
           activeDeadlineSeconds: 600
           env:
           - name: SLEEP_SECONDS
@@ -1644,8 +1583,7 @@ objects:
             mountPath: /opt/system-extra-configs
         volumes:
         - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
+          emptyDir: {}
         - name: system-config
           configMap:
             name: system
@@ -1731,8 +1669,7 @@ objects:
               memory: 200Mi
         volumes:
         - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
+          emptyDir: {}
     triggers:
       - type: ConfigChange
       - type: ImageChange
@@ -1800,8 +1737,7 @@ objects:
           emptyDir:
             medium: Memory
         - name: system-storage
-          persistentVolumeClaim:
-            claimName: system-storage
+          emptyDir: {}
         - name: system-config
           configMap:
             name: system
@@ -1897,8 +1833,7 @@ objects:
             imagePullPolicy: IfNotPresent
         volumes:
           - name: mysql-storage
-            persistentVolumeClaim:
-              claimName: mysql-storage
+            emptyDir: {}
           - name: mysql-extra-conf
             configMap:
               name: mysql-extra-conf
@@ -1989,7 +1924,7 @@ objects:
       system: postgresql
   spec:
     tags:
-      - name: 9.5
+      - name: '9.5'
         from:
           kind: DockerImage
           name: registry.access.redhat.com/rhscl/postgresql-95-rhel7:9.5

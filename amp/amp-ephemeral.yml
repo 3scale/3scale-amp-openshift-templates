@@ -235,8 +235,8 @@ objects:
       spec:
         initContainers:
         - name: backend-redis-svc
-          image: busybox
-          command: ['sh', '-c', 'until $(nc -z backend-redis 6379); do sleep $SLEEP_SECONDS; done']
+          image: registry.access.redhat.com/rhel-atomic:7.5
+          command: ['sh', '-c', 'until $(echo -n > /dev/tcp/backend-redis/6379); do sleep $SLEEP_SECONDS; done']
           activeDeadlineSeconds: 600
           env:
           - name: SLEEP_SECONDS
@@ -560,8 +560,8 @@ objects:
       spec:
         initContainers:
         - name: backend-redis-svc
-          image: busybox
-          command: ['sh', '-c', 'until $(nc -z backend-redis 6379); do sleep $SLEEP_SECONDS; done']
+          image: registry.access.redhat.com/rhel-atomic:7.5
+          command: ['sh', '-c', 'until $(echo -n > /dev/tcp/backend-redis/6379); do sleep $SLEEP_SECONDS; done']
           activeDeadlineSeconds: 600
           env:
           - name: SLEEP_SECONDS
@@ -767,8 +767,8 @@ objects:
           emptyDir: {}
         initContainers:
         - name: zync-svc
-          image: busybox
-          command: ['sh', '-c', 'until $(wget -qO /dev/null http://zync:8080/status/ready); do sleep $SLEEP_SECONDS; done']
+          image: registry.access.redhat.com/rhel-atomic:7.5
+          command: ['sh', '-c', 'until $(curl --output /dev/null --silent --head --fail http://zync:8080/status/ready); do sleep $SLEEP_SECONDS; done']
           activeDeadlineSeconds: 600
           env:
           - name: SLEEP_SECONDS
@@ -1175,8 +1175,8 @@ objects:
       spec:
         initContainers:
         - name: system-master-svc
-          image: busybox
-          command: ['sh', '-c', 'until $(nc -z system-master 3000); do sleep $SLEEP_SECONDS; done']
+          image: registry.access.redhat.com/rhel-atomic:7.5
+          command: ['sh', '-c', 'until $(echo -n > /dev/tcp/system-master/3000); do sleep $SLEEP_SECONDS; done']
           activeDeadlineSeconds: 600
           env:
           - name: SLEEP_SECONDS
@@ -1924,10 +1924,10 @@ objects:
       system: postgresql
   spec:
     tags:
-      - name: '9.5'
-        from:
-          kind: DockerImage
-          name: registry.access.redhat.com/rhscl/postgresql-95-rhel7:9.5
+    - name: "9.5"
+      from:
+        kind: DockerImage
+        name: registry.access.redhat.com/rhscl/postgresql-95-rhel7:9.5
 
 - kind: ImageStream
   apiVersion: v1

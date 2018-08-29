@@ -24,6 +24,8 @@ items:
           will automatically update to use the latest version of 3Scale APIcast API Gateway
           available on OpenShift, including major versions updates.
         tags: api,gateway,3scale
+      referencePolicy:
+        type: Local
       from:
         kind: ImageStreamTag
         name: 2.2.0.GA
@@ -39,9 +41,11 @@ items:
           with external Identity Providers such as Red Hat Single Sign On, for API traffic authentication.
         tags: api,gateway,3scale
         version: 2.1.0.GA
+      referencePolicy:
+        type: Local
       from:
         kind: DockerImage
-        name: registry.access.redhat.com/3scale-amp21/apicast-gateway:1.4-2
+        name: registry.redhat.io/3scale-amp21/apicast-gateway:1.4-2
 
     - name: 2.2.0.GA
       annotations:
@@ -54,6 +58,8 @@ items:
           with external Identity Providers such as Red Hat Single Sign On, for API traffic authentication.
         tags: api,gateway,3scale
         version: 2.2.0.GA
+      referencePolicy:
+        type: Local
       from:
         kind: DockerImage
-        name: registry.access.redhat.com/3scale-amp22/apicast-gateway:1.8
+        name: registry.redhat.io/3scale-amp22/apicast-gateway:1.8

@@ -28,6 +28,9 @@ objects:
       metadata:
         labels:
           deploymentconfig: "${APICAST_NAME}"
+        annotations:
+          prometheus.io/scrape: 'true'
+          prometheus.io/port: '9421'
       spec:
         containers:
         - env:
@@ -60,9 +63,7 @@ objects:
             value: "${MANAGEMENT_API}"
           - name: OPENSSL_VERIFY
             value: "${OPENSSL_VERIFY}"
-          - name: APICAST_WORKERS
-            value: "${APICAST_WORKERS}"
-          image: amp-apicast:latest
+          image: ${AMP_APICAST_IMAGE}
           imagePullPolicy: IfNotPresent
           name: "${APICAST_NAME}"
           livenessProbe:
@@ -83,6 +84,9 @@ objects:
             protocol: TCP
           - name: management
             containerPort: 8090
+            protocol: TCP
+          - name: metrics
+            containerPort: 9421
             protocol: TCP
           resources:
             limits:
@@ -129,6 +133,10 @@ objects:
   type: Opaque
 
 parameters:
+- name: AMP_RELEASE
+  description: "AMP release tag."
+  value: "2.3.0"
+  required: true
 - description: "Access Token (not a Service Token) for the 3scale Account Management API"
   value:
   name: ACCESS_TOKEN
@@ -137,7 +145,10 @@ parameters:
   value:
   name: DOMAIN
   required: true
-- description: "Path to saved JSON file with configuration for the gateway. Has to be injected to the docker image as read only volume."
+- name: AMP_APICAST_IMAGE
+  value: "amp-apicast:latest"
+  required: true
+- description: "Path to saved JSON file with configuration for the gateway. Has to be injected to the container image as read only volume."
   value:
   name: CONFIGURATION_FILE_PATH
   required: false
@@ -148,10 +159,6 @@ parameters:
 - description: "Name for the 3scale API Gateway"
   value: apicast
   name: APICAST_NAME
-  required: true
-- description: "Number of worker processes to start."
-  value: "1"
-  name: APICAST_WORKERS
   required: true
 - description: "DNS Resolver for openresty, if empty it will be autodiscovered"
   value:

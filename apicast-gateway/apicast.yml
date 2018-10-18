@@ -131,7 +131,7 @@ parameters:
   value:
   name: CONFIGURATION_FILE_PATH
   required: false
-- description: "Deployment environment. Can be sandbox or production."
+- description: "Deployment environment. Can be staging or production."
   value: production
   name: DEPLOYMENT_ENVIRONMENT
   required: true

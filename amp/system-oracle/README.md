@@ -25,33 +25,47 @@ It will create the user and grant the appropriate roles and rights to the user c
 
 ## Instructions
 
-* Place the downloaded files in the `oracle-client-files` directory.
-* Download the productized amp.yml template.
-* Run on your machine by replacing `WILDCARD_DOMAIN` and `DATABASE_URL` variables accordingly to your setup
+1 - Place the downloaded files in the `oracle-client-files` directory.
+
+
+2 - Download the productized amp.yml template.
+
+
+3 - Run on your machine by replacing `WILDCARD_DOMAIN`
+
 
 ```
 $ oc new-app -f build.yml
 $ oc new-app -f amp.yml -p WILDCARD_DOMAIN=mydomain.com
-$ for dc in system-app system-resque system-sidekiq system-sphinx; do oc env dc/$dc --overwrite DATABASE_URL="oracle-enhanced://user:password@my-oracle-database.com:1521/threescalepdb"; done
 ```
 
-:warning: In the next step please REPLACE `"<<<<DATABASE_URL>>>>"` by the Oracle Database URL string, example: "oracle-enhanced://user:password@my-oracle-database.com:1521/threescalepdb"
-
-```
-$ oc patch dc/system-app -p '[{"op": "replace", "path": "/spec/strategy/rollingParams/pre/execNewPod/env/1/value", "value": "<<<<DATABASE_URL>>>>"}]' --type=json
-````
-
+4 - Run on your machine
 
 :warning: In the next step please REPLACE `"<<<<SYSTEM_PASSWORD>>>>"` by the Oracle Database `SYSTEM` user password.
 
 ```
 $ oc patch dc/system-app -p '[{"op": "add", "path": "/spec/strategy/rollingParams/pre/execNewPod/env/-", "value": {"name": "ORACLE_SYSTEM_PASSWORD", "value": "<<<<SYSTEM_PASSWORD>>>>"}}]' --type=json
-```
-
-Then starts the build:
+$ oc patch dc/system-app -p '{"spec": {"strategy": {"rollingParams": {"post":{"execNewPod": {"env": [{"name": "ORACLE_SYSTEM_PASSWORD", "value": "<<<<SYSTEM_PASSWORD>>>>"}]}}}}}}'
 
 ```
-oc start-build 3scale-amp-system-oracle --from-dir=.
+
+
+5 - Change your DATABASE_URL to point to your Oracle Database (see last section). To do so:
+
+
+:warning: In the next step please REPLACE `"<<<<DESIRED_VALUE_FOR_DATABASE_URL>>>>"` by the Oracle Database URL as specified in the last section
+
+```
+$ oc patch secret/system-database -p '{"stringData": {"URL": "<<<<DESIRED_VALUE_FOR_DATABASE_URL>>>>"}}'
+```
+
+
+
+6 - Then starts the build
+
+
+```
+$ oc start-build 3scale-amp-system-oracle --from-dir=.
 ```
 
 ## DATABASE_URL parameter specification

@@ -118,10 +118,10 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: "2.3.0"
+  value: "2.4.0"
   required: true
 - name: AMP_APICAST_IMAGE
-  value: "registry.access.redhat.com/3scale-amp23/apicast-gateway"
+  value: "registry.access.redhat.com/3scale-amp24/apicast-gateway"
   required: true
 - description: "Name of the secret containing the THREESCALE_PORTAL_ENDPOINT with the access-token or provider key"
   value: apicast-configuration-url-secret
@@ -131,7 +131,7 @@ parameters:
   value:
   name: CONFIGURATION_FILE_PATH
   required: false
-- description: "Deployment environment. Can be sandbox or production."
+- description: "Deployment environment. Can be staging or production."
   value: production
   name: DEPLOYMENT_ENVIRONMENT
   required: true

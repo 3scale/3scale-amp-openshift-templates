@@ -135,7 +135,7 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: "2.3.0"
+  value: "2.4.0"
   required: true
 - description: "Access Token (not a Service Token) for the 3scale Account Management API"
   value:
@@ -152,7 +152,7 @@ parameters:
   value:
   name: CONFIGURATION_FILE_PATH
   required: false
-- description: "Deployment environment. Can be sandbox or production."
+- description: "Deployment environment. Can be staging or production."
   value: production
   name: DEPLOYMENT_ENVIRONMENT
   required: true

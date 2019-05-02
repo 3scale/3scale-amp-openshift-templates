@@ -135,7 +135,7 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: "2.4.0"
+  value: "2.5.0"
   required: true
 - description: "Access Token (not a Service Token) for the 3scale Account Management API"
   value:

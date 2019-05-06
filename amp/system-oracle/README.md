@@ -60,8 +60,16 @@ $ oc patch secret/system-database -p '{"stringData": {"URL": "<<<<DESIRED_VALUE_
 ```
 
 
+6 - :warning: If you are using a Non Containerized database, apply the patch located in `workaround-non-cdb-2.4-upgrade/dockerfile.patch` 
 
-6 - Then starts the build
+For UNIX operating systems:
+
+```
+patch -p1 < workaround-non-cdb-2.4-upgrade/dockerfile.patch
+```
+
+
+7 - Then starts the build
 
 
 ```

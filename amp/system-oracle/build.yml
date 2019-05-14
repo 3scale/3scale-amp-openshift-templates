@@ -27,5 +27,5 @@ objects:
 
 parameters:
   - name: AMP_RELEASE
-    value: 2.4.0
+    value: 2.5.0
     description: 3scale AMP release version

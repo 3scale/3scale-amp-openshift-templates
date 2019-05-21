@@ -60,13 +60,20 @@ $ oc patch secret/system-database -p '{"stringData": {"URL": "<<<<DESIRED_VALUE_
 ```
 
 
-6 - :warning: If you are using a Non Containerized database, apply the patch located in `workaround-non-cdb-2.4-upgrade/dockerfile.patch` 
+6 - :warning: If you are using a Non Containerized database, apply one of the patches located in `workaround-non-cdb-2.4-upgrade/dockerfile.patch` or `workaround-non-cdb-2.5-upgrade/dockerfile.patch` depending on your 3scale version
 
-For UNIX operating systems:
+For UNIX operating systems on 3scale 2.4:
 
 ```
 patch -p1 < workaround-non-cdb-2.4-upgrade/dockerfile.patch
 ```
+
+For UNIX operating systems on 3scale 2.5:
+
+```
+patch -p1 < workaround-non-cdb-2.5-upgrade/dockerfile.patch
+```
+
 
 
 7 - Then starts the build

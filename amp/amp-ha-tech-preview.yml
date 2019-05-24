@@ -316,6 +316,16 @@ objects:
               secretKeyRef:
                 key: REDIS_QUEUES_URL
                 name: backend-redis
+          - name: CONFIG_QUEUES_SENTINEL_HOSTS
+            valueFrom:
+              secretKeyRef:
+                key: REDIS_QUEUES_SENTINEL_HOSTS
+                name: backend-redis
+          - name: CONFIG_QUEUES_SENTINEL_ROLE
+            valueFrom:
+              secretKeyRef:
+                key: REDIS_QUEUES_SENTINEL_ROLE
+                name: backend-redis
           image: amp-backend:latest
           name: backend-redis-svc
           resources: {}
@@ -614,6 +624,16 @@ objects:
             valueFrom:
               secretKeyRef:
                 key: REDIS_QUEUES_URL
+                name: backend-redis
+          - name: CONFIG_QUEUES_SENTINEL_HOSTS
+            valueFrom:
+              secretKeyRef:
+                key: REDIS_QUEUES_SENTINEL_HOSTS
+                name: backend-redis
+          - name: CONFIG_QUEUES_SENTINEL_ROLE
+            valueFrom:
+              secretKeyRef:
+                key: REDIS_QUEUES_SENTINEL_ROLE
                 name: backend-redis
           image: amp-backend:latest
           name: backend-redis-svc

@@ -74,7 +74,7 @@ For UNIX operating systems on 3scale 2.5:
 patch -p1 < workaround-non-cdb-2.5-upgrade/dockerfile.patch
 ```
 
-
+On 3scale 2.6+, there is no need to apply any workaround patch for Non Containerized database
 
 7 - Then starts the build
 

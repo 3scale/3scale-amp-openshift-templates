@@ -7,6 +7,9 @@ COPY ./oracle-client-files/instantclient-basic*-linux.x64-12.2.*.zip \
      ./oracle-client-files/instantclient-odbc-linux.x64-12.2.*.zip \
      /opt/oracle/
 
+COPY ./oracle-client-files/vendor/cache/activerecord-oracle_enhanced-adapter-1.6.9.gem /opt/system/vendor/cache
+COPY Gemfile.oracle /opt/system
+
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_12_2/ \
     ORACLE_HOME=/opt/oracle/instantclient_12_2/ \
     DB=oracle \
@@ -20,7 +23,7 @@ RUN unzip /opt/oracle/instantclient-basic*-linux.x64-12.2.*.zip -d /opt/oracle/ 
  && rm -f /opt/oracle/*.zip \
  && (cd /opt/oracle/instantclient_12_2/ && ln -s libclntsh.so.12.1 libclntsh.so) \
  && source /opt/app-root/etc/scl_enable \
- && DB=oracle bundle install --local --deployment --jobs $(grep -c processor /proc/cpuinfo) --retry=5
+ && BUNDLE_GEMFILE=Gemfile.oracle DB=oracle bundle install --deployment --jobs $(grep -c processor /proc/cpuinfo) --retry=5
 
 
 USER 1001

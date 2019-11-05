@@ -3,6 +3,7 @@
 
 ## Prerequisites
 
+### Oracle Library Binaries
 In order to work with Oracle Database for Red Hat 3scale API Management, you will need to create a custom image as Red Hat cannot distribute the binaries of Oracle Database client.
 
 You **MUST** download the client (basic-lite or basic), the odbc driver and the sdk for **12.2** in [Oracle Technology Network](http://www.oracle.com/technetwork/database/features/instant-client/index-097480.html).
@@ -17,6 +18,14 @@ Example:
     * instantclient-sdk-linux.x64-12.2.0.1.0.zip
     * instantclient-odbc-linux.x64-12.2.0.1.0-2.zip
 
+### Oracle Gem
+
+With the binaries in place, you'll also need to fetch the open source gem:  
+
+```
+BUNDLE_GEMFILE=Gemfile.oracle bundle package --no-install --all --path .
+```
+
 ### Oracle Database user SYSTEM password
 
 We **need** the Oracle Database user `SYSTEM` password.
@@ -27,11 +36,12 @@ It will create the user and grant the appropriate roles and rights to the user c
 
 1 - Place the downloaded files in the `oracle-client-files` directory.
 
+2 - Fetch the open source gem and place it in the `oracle-client-files` directory, with: `BUNDLE_GEMFILE=Gemfile.oracle bundle package --no-install --all --path .`
 
-2 - Download the productized amp.yml template.
+3 - Download the productized amp.yml template.
 
 
-3 - Run on your machine by replacing `WILDCARD_DOMAIN`
+4 - Run on your machine by replacing `WILDCARD_DOMAIN`
 
 
 ```

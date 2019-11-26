@@ -200,80 +200,6 @@ objects:
   kind: ImageStream
   metadata:
     annotations:
-      openshift.io/display-name: Backend Redis
-    creationTimestamp: null
-    labels:
-      app: ${APP_LABEL}
-      threescale_component: backend
-    name: backend-redis
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/display-name: Backend Redis (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
-        openshift.io/display-name: Backend ${AMP_RELEASE} Redis
-      from:
-        kind: DockerImage
-        name: ${REDIS_IMAGE}
-      generation: null
-      importPolicy:
-        insecure: ${{IMAGESTREAM_TAG_IMPORT_INSECURE}}
-      name: ${AMP_RELEASE}
-      referencePolicy:
-        type: ""
-  status:
-    dockerImageRepository: ""
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    annotations:
-      openshift.io/display-name: System Redis
-    creationTimestamp: null
-    labels:
-      app: ${APP_LABEL}
-      threescale_component: system
-    name: system-redis
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/display-name: System Redis (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
-        openshift.io/display-name: System ${AMP_RELEASE} Redis
-      from:
-        kind: DockerImage
-        name: ${REDIS_IMAGE}
-      generation: null
-      importPolicy:
-        insecure: ${{IMAGESTREAM_TAG_IMPORT_INSECURE}}
-      name: ${AMP_RELEASE}
-      referencePolicy:
-        type: ""
-  status:
-    dockerImageRepository: ""
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    annotations:
       openshift.io/display-name: System Memcached
     creationTimestamp: null
     labels:
@@ -527,6 +453,43 @@ objects:
       requests:
         storage: 1Gi
   status: {}
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/display-name: Backend Redis
+    creationTimestamp: null
+    labels:
+      app: ${APP_LABEL}
+      threescale_component: backend
+    name: backend-redis
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/display-name: Backend Redis (latest)
+      from:
+        kind: ImageStreamTag
+        name: ${AMP_RELEASE}
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+    - annotations:
+        openshift.io/display-name: Backend ${AMP_RELEASE} Redis
+      from:
+        kind: DockerImage
+        name: ${REDIS_IMAGE}
+      generation: null
+      importPolicy:
+        insecure: ${{IMAGESTREAM_TAG_IMPORT_INSECURE}}
+      name: ${AMP_RELEASE}
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
@@ -630,6 +593,62 @@ objects:
       requests:
         storage: 1Gi
   status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${APP_LABEL}
+      threescale_component: system
+      threescale_component_element: redis
+    name: system-redis
+  spec:
+    ports:
+    - name: redis
+      port: 6379
+      protocol: TCP
+      targetPort: 6379
+    selector:
+      deploymentConfig: system-redis
+  status:
+    loadBalancer: {}
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/display-name: System Redis
+    creationTimestamp: null
+    labels:
+      app: ${APP_LABEL}
+      threescale_component: system
+    name: system-redis
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/display-name: System Redis (latest)
+      from:
+        kind: ImageStreamTag
+        name: ${AMP_RELEASE}
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+    - annotations:
+        openshift.io/display-name: System ${AMP_RELEASE} Redis
+      from:
+        kind: DockerImage
+        name: ${REDIS_IMAGE}
+      generation: null
+      importPolicy:
+        insecure: ${{IMAGESTREAM_TAG_IMPORT_INSECURE}}
+      name: ${AMP_RELEASE}
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
@@ -1485,25 +1504,6 @@ objects:
     labels:
       app: ${APP_LABEL}
       threescale_component: system
-      threescale_component_element: redis
-    name: system-redis
-  spec:
-    ports:
-    - name: redis
-      port: 6379
-      protocol: TCP
-      targetPort: 6379
-    selector:
-      deploymentConfig: system-redis
-  status:
-    loadBalancer: {}
-- apiVersion: v1
-  kind: Service
-  metadata:
-    creationTimestamp: null
-    labels:
-      app: ${APP_LABEL}
-      threescale_component: system
       threescale_component_element: sphinx
     name: system-sphinx
   spec:
@@ -1538,28 +1538,7 @@ objects:
 - apiVersion: v1
   data:
     rolling_updates.yml: |
-      production:
-        old_charts: false
-        new_provider_documentation: false
-        proxy_pro: false
-        instant_bill_plan_change: false
-        service_permissions: true
-        async_apicast_deploy: false
-        duplicate_application_id: true
-        duplicate_user_key: true
-        plan_changes_wizard: false
-        require_cc_on_signup: false
-        apicast_per_service: true
-        new_notification_system: true
-        cms_api: false
-        apicast_v2: true
-        forum: false
-        published_service_plan_signup: true
-        apicast_oidc: true
-        policies: true
-        policy_registry: true
-        proxy_private_base_path: true
-        service_mesh_integration: true
+      production: {}
     service_discovery.yml: |
       production:
         enabled: <%= cluster_token_file_exists = File.exists?(cluster_token_file_path = '/var/run/secrets/kubernetes.io/serviceaccount/token') %>
@@ -1661,6 +1640,8 @@ objects:
             - bash
             - -c
             - bundle exec rake boot openshift:deploy MASTER_ACCESS_TOKEN="${MASTER_ACCESS_TOKEN}"
+              && bundle exec rake services:create_backend_apis services:update_metric_owners
+              proxy:update_proxy_rule_owners
             containerName: system-master
             env:
             - name: AMP_RELEASE
@@ -3577,10 +3558,12 @@ objects:
           - name: POD_NAME
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.name
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.namespace
           image: amp-zync:latest
           livenessProbe:
@@ -3704,10 +3687,12 @@ objects:
           - name: POD_NAME
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.name
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.namespace
           image: amp-zync:latest
           imagePullPolicy: Always
@@ -4181,7 +4166,7 @@ parameters:
 - description: AMP release tag.
   name: AMP_RELEASE
   required: true
-  value: "2.6"
+  value: "2.7"
 - description: Used for object app labels
   name: APP_LABEL
   required: true
@@ -4196,16 +4181,16 @@ parameters:
   value: "null"
 - name: AMP_BACKEND_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp26/backend
+  value: registry.redhat.io/3scale-amp2/backend-rhel7:3scale2.7
 - name: AMP_ZYNC_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp26/zync
+  value: registry.redhat.io/3scale-amp2/zync-rhel7:3scale2.7
 - name: AMP_APICAST_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp26/apicast-gateway
+  value: registry.redhat.io/3scale-amp2/apicast-gateway-rhel7:3scale2.7
 - name: AMP_SYSTEM_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp26/system
+  value: registry.redhat.io/3scale-amp2/system-rhel7:3scale2.7
 - description: Zync's PostgreSQL image to use
   name: ZYNC_DATABASE_IMAGE
   required: true
@@ -4213,7 +4198,7 @@ parameters:
 - description: Memcached image to use
   name: MEMCACHED_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp20/memcached
+  value: registry.redhat.io/3scale-amp2/memcached-rhel7:3scale2.7
 - description: Set to true if the server may bypass certificate verification or connect
     directly over HTTP during image import.
   name: IMAGESTREAM_TAG_IMPORT_INSECURE

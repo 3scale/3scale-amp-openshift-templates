@@ -1,4 +1,4 @@
-FROM amp-system:2.6
+FROM amp-system:2.7
 
 USER root
 

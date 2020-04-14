@@ -1,0 +1,13 @@
+diff --git i/amp/system-oracle/Dockerfile w/amp/system-oracle/Dockerfile
+index 95d85a0..e28d766 100644
+--- i/amp/system-oracle/Dockerfile
++++ w/amp/system-oracle/Dockerfile
+@@ -7,6 +7,8 @@ COPY ./oracle-client-files/instantclient-basic*-linux.x64-12.2.*.zip \
+      ./oracle-client-files/instantclient-odbc-linux.x64-12.2.*.zip \
+      /opt/oracle/
+
++ADD ./workaround-oracle-service-name/database.rb /opt/system/lib/system/database.rb
++
+ ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_12_2/ \
+     ORACLE_HOME=/opt/oracle/instantclient_12_2/ \
+     DB=oracle \

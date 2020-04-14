@@ -65,18 +65,26 @@ $ oc patch secret/system-database -p '{"stringData": {"URL": "<<<<DESIRED_VALUE_
 For UNIX operating systems on 3scale 2.4:
 
 ```
-patch -p1 < workaround-non-cdb-2.4-upgrade/dockerfile.patch
+$ patch -p1 < workaround-non-cdb-2.4-upgrade/dockerfile.patch
 ```
 
 For UNIX operating systems on 3scale 2.5:
 
 ```
-patch -p1 < workaround-non-cdb-2.5-upgrade/dockerfile.patch
+$ patch -p1 < workaround-non-cdb-2.5-upgrade/dockerfile.patch
 ```
 
 On 3scale 2.6+, there is no need to apply any workaround patch for Non Containerized database
 
-7 - Then starts the build
+7- :warning: If you are using 3scale 2.7 or later **and** a Containerized database **and** any one of the values of `PDB`, `Service Name, or `Network Service Name` do not match in Oracle apply the patch found in `workaround-oracle-service-name/dockerfile.patch`.
+
+For UNIX operating systems:
+
+```
+$ patch -p1 < workaround-oracle-service-name/dockerfile.patch
+```
+
+8 - Then start the build
 
 
 ```

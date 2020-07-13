@@ -15,17 +15,22 @@ objects:
     output:
       to:
         kind: "ImageStreamTag"
-        name: "amp-system:latest"
-
+        name: "amp-system:${AMP_RELEASE}-oracle"
     strategy:
       type: Docker
       dockerStrategy:
         from:
-          kind: "ImageStreamTag"
-          name: "amp-system:${AMP_RELEASE}"
-
+          kind: "DockerImage"
+          name: "registry.redhat.io/3scale-amp2/system-rhel7:3scale${AMP_RELEASE}"
+        pullSecret:
+          name: "${PULLSECRET_NAME}"
+        forcePull: true
 
 parameters:
   - name: AMP_RELEASE
-    value: "2.8"
+    value: "2.9"
     description: 3scale AMP release version
+  - name: PULLSECRET_NAME
+    description: PullSecret is the name of a Secret that would be used for setting up the authentication for pulling the Docker images from the private Docker registries
+    value: "threescale-registry-auth"
+    required: true

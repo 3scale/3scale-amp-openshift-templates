@@ -83,6 +83,53 @@ On 3scale 2.6+, there is no need to apply any workaround patch for Non Container
 $ oc start-build 3scale-amp-system-oracle --from-dir=.
 ```
 
+8 - Wait until the build completes. The available build names can be listed by
+    executing `oc get builds` and then the state of a specific build can be
+    verified with:
+```
+$ oc get build <build-name> -o jsonpath="{.status.phase}"
+```
+
+Wait until the build is in 'Complete' state
+
+9 - Update the ImageChange triggers of the DeploymentConfigs that use the System image
+    to use the new Oracle-based System image:
+
+Save the current 3scale release in an environment variable:
+```
+$ export THREESCALE_RELEASE=2.9
+```
+
+Update system-app DeploymentConfig's ImageChangeTrigger:
+```
+$ oc set triggers dc/system-app --from-image=amp-system:${THREESCALE_RELEASE} --containers=system-master,system-developer,system-provider --remove
+$ oc set triggers dc/system-app --from-image=amp-system:${THREESCALE_RELEASE}-oracle --containers=system-master,system-developer,system-provider
+```
+
+
+This triggers a redeployment of system-app DeploymentConfig. Wait until it is
+redeployed, its corresponding new pods are ready, and the old ones terminated.
+
+
+Update system-sidekiq DeploymentConfig's ImageChangeTrigger:
+```
+$ oc set triggers dc/system-sidekiq --from-image=amp-system:${THREESCALE_RELEASE} --containers=system-sidekiq,check-svc --remove
+$ oc set triggers dc/system-sidekiq --from-image=amp-system:${THREESCALE_RELEASE}-oracle --containers=system-sidekiq,check-svc
+```
+
+This triggers a redeployment of system-sidekiq DeploymentConfig. Wait until it is
+redeployed,  its corresponding new pods are ready, and the old ones terminated.
+
+Update system-sphinx DeploymentConfig's ImageChangeTriger:
+```
+$ oc set triggers dc/system-sphinx --from-image=amp-system:${THREESCALE_RELEASE} --containers=system-sphinx,system-master-svc --remove
+$ oc set triggers dc/system-sphinx --from-image=amp-system:${THREESCALE_RELEASE}-oracle --containers=system-sphinx,system-master-svc
+```
+
+This triggers a redeployment of system-sphinx DeploymentConfig. Wait until it is
+redeployed, its corresponding new pods are ready, and the old ones terminated.
+
+
 ## DATABASE_URL parameter specification
 
 The `DATABASE_URL` parameter **MUST** follow this format `oracle-enhanced://${user}:${password}@${host}:${port}/${database}`

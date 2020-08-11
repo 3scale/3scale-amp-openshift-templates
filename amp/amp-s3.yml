@@ -27,16 +27,6 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/display-name: amp-backend (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
         openshift.io/display-name: amp-backend ${AMP_RELEASE}
       from:
         kind: DockerImage
@@ -63,16 +53,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: AMP Zync (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: AMP Zync ${AMP_RELEASE}
       from:
@@ -101,16 +81,6 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/display-name: AMP APIcast (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
         openshift.io/display-name: AMP APIcast ${AMP_RELEASE}
       from:
         kind: DockerImage
@@ -137,16 +107,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: AMP System (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: AMP system ${AMP_RELEASE}
       from:
@@ -175,16 +135,6 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/display-name: Zync PostgreSQL (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
         openshift.io/display-name: Zync ${AMP_RELEASE} PostgreSQL
       from:
         kind: DockerImage
@@ -211,16 +161,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: System Memcached (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: System ${AMP_RELEASE} Memcached
       from:
@@ -255,16 +195,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: System MySQL (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: System ${AMP_RELEASE} MySQL
       from:
@@ -360,7 +290,7 @@ objects:
         - backend-redis
         from:
           kind: ImageStreamTag
-          name: backend-redis:latest
+          name: backend-redis:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -455,7 +385,6 @@ objects:
   spec:
     accessModes:
     - ReadWriteOnce
-    dataSource: null
     resources:
       requests:
         storage: 1Gi
@@ -474,16 +403,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: Backend Redis (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: Backend ${AMP_RELEASE} Redis
       from:
@@ -580,7 +499,7 @@ objects:
         - system-redis
         from:
           kind: ImageStreamTag
-          name: system-redis:latest
+          name: system-redis:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -601,7 +520,6 @@ objects:
   spec:
     accessModes:
     - ReadWriteOnce
-    dataSource: null
     resources:
       requests:
         storage: 1Gi
@@ -639,16 +557,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: System Redis (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: System ${AMP_RELEASE} Redis
       from:
@@ -801,7 +709,7 @@ objects:
         - backend-cron
         from:
           kind: ImageStreamTag
-          name: amp-backend:latest
+          name: amp-backend:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -933,7 +841,7 @@ objects:
         - backend-listener
         from:
           kind: ImageStreamTag
-          name: amp-backend:latest
+          name: amp-backend:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -1132,7 +1040,7 @@ objects:
         - backend-worker
         from:
           kind: ImageStreamTag
-          name: amp-backend:latest
+          name: amp-backend:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -1291,7 +1199,7 @@ objects:
         - system-mysql
         from:
           kind: ImageStreamTag
-          name: system-mysql:latest
+          name: system-mysql:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -1364,7 +1272,6 @@ objects:
   spec:
     accessModes:
     - ReadWriteOnce
-    dataSource: null
     resources:
       requests:
         storage: 1Gi
@@ -1455,7 +1362,7 @@ objects:
         - memcache
         from:
           kind: ImageStreamTag
-          name: system-memcached:latest
+          name: system-memcached:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3017,7 +2924,7 @@ objects:
         - system-master
         from:
           kind: ImageStreamTag
-          name: amp-system:latest
+          name: amp-system:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3448,7 +3355,7 @@ objects:
         - system-sidekiq
         from:
           kind: ImageStreamTag
-          name: amp-system:latest
+          name: amp-system:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3597,7 +3504,7 @@ objects:
         - system-sphinx
         from:
           kind: ImageStreamTag
-          name: amp-system:latest
+          name: amp-system:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3646,7 +3553,6 @@ objects:
     name: system-master-apicast
   stringData:
     ACCESS_TOKEN: ${APICAST_ACCESS_TOKEN}
-    BASE_URL: http://${APICAST_ACCESS_TOKEN}@system-master:3000
     PROXY_CONFIGS_ENDPOINT: http://${APICAST_ACCESS_TOKEN}@system-master:3000/master/api/proxy/configs
   type: Opaque
 - apiVersion: v1
@@ -3880,7 +3786,7 @@ objects:
         - zync
         from:
           kind: ImageStreamTag
-          name: amp-zync:latest
+          name: amp-zync:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3992,7 +3898,7 @@ objects:
         - que
         from:
           kind: ImageStreamTag
-          name: amp-zync:latest
+          name: amp-zync:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -4081,7 +3987,7 @@ objects:
         - postgresql
         from:
           kind: ImageStreamTag
-          name: zync-database-postgresql:latest
+          name: zync-database-postgresql:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -4250,7 +4156,7 @@ objects:
         - apicast-staging
         from:
           kind: ImageStreamTag
-          name: amp-apicast:latest
+          name: amp-apicast:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -4381,7 +4287,7 @@ objects:
         - apicast-production
         from:
           kind: ImageStreamTag
-          name: amp-apicast:latest
+          name: amp-apicast:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -4466,7 +4372,7 @@ parameters:
 - description: AMP release tag.
   name: AMP_RELEASE
   required: true
-  value: "2.8"
+  value: "2.9"
 - description: Used for object app labels
   name: APP_LABEL
   required: true
@@ -4478,16 +4384,16 @@ parameters:
   value: 3scale
 - name: AMP_BACKEND_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/backend-rhel7:3scale2.8
+  value: registry.redhat.io/3scale-amp2/backend-rhel7:3scale2.9
 - name: AMP_ZYNC_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/zync-rhel7:3scale2.8
+  value: registry.redhat.io/3scale-amp2/zync-rhel7:3scale2.9
 - name: AMP_APICAST_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.8
+  value: registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.9
 - name: AMP_SYSTEM_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/system-rhel7:3scale2.8
+  value: registry.redhat.io/3scale-amp2/system-rhel7:3scale2.9
 - description: Zync's PostgreSQL image to use
   name: ZYNC_DATABASE_IMAGE
   required: true
@@ -4495,7 +4401,7 @@ parameters:
 - description: Memcached image to use
   name: MEMCACHED_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/memcached-rhel7:3scale2.8
+  value: registry.redhat.io/3scale-amp2/memcached-rhel7:3scale2.9
 - description: Set to true if the server may bypass certificate verification or connect
     directly over HTTP during image import.
   name: IMAGESTREAM_TAG_IMPORT_INSECURE

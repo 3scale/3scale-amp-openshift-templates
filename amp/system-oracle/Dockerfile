@@ -1,4 +1,4 @@
-FROM amp-system:2.8
+FROM registry.redhat.io/3scale-amp2/system-rhel7:3scale2.9
 
 USER root
 

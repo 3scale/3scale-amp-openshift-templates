@@ -26,16 +26,6 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/display-name: amp-backend (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
         openshift.io/display-name: amp-backend ${AMP_RELEASE}
       from:
         kind: DockerImage
@@ -62,16 +52,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: AMP Zync (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: AMP Zync ${AMP_RELEASE}
       from:
@@ -100,16 +80,6 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/display-name: AMP APIcast (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
         openshift.io/display-name: AMP APIcast ${AMP_RELEASE}
       from:
         kind: DockerImage
@@ -136,16 +106,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: AMP System (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: AMP system ${AMP_RELEASE}
       from:
@@ -174,16 +134,6 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/display-name: Zync PostgreSQL (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-    - annotations:
         openshift.io/display-name: Zync ${AMP_RELEASE} PostgreSQL
       from:
         kind: DockerImage
@@ -210,16 +160,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: System Memcached (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: System ${AMP_RELEASE} Memcached
       from:
@@ -254,16 +194,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: System PostgreSQL (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: System ${AMP_RELEASE} PostgreSQL
       from:
@@ -359,7 +289,7 @@ objects:
         - backend-redis
         from:
           kind: ImageStreamTag
-          name: backend-redis:latest
+          name: backend-redis:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -454,7 +384,6 @@ objects:
   spec:
     accessModes:
     - ReadWriteOnce
-    dataSource: null
     resources:
       requests:
         storage: 1Gi
@@ -473,16 +402,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: Backend Redis (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: Backend ${AMP_RELEASE} Redis
       from:
@@ -579,7 +498,7 @@ objects:
         - system-redis
         from:
           kind: ImageStreamTag
-          name: system-redis:latest
+          name: system-redis:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -600,7 +519,6 @@ objects:
   spec:
     accessModes:
     - ReadWriteOnce
-    dataSource: null
     resources:
       requests:
         storage: 1Gi
@@ -638,16 +556,6 @@ objects:
     lookupPolicy:
       local: false
     tags:
-    - annotations:
-        openshift.io/display-name: System Redis (latest)
-      from:
-        kind: ImageStreamTag
-        name: ${AMP_RELEASE}
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
     - annotations:
         openshift.io/display-name: System ${AMP_RELEASE} Redis
       from:
@@ -800,7 +708,7 @@ objects:
         - backend-cron
         from:
           kind: ImageStreamTag
-          name: amp-backend:latest
+          name: amp-backend:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -932,7 +840,7 @@ objects:
         - backend-listener
         from:
           kind: ImageStreamTag
-          name: amp-backend:latest
+          name: amp-backend:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -1131,7 +1039,7 @@ objects:
         - backend-worker
         from:
           kind: ImageStreamTag
-          name: amp-backend:latest
+          name: amp-backend:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -1274,7 +1182,7 @@ objects:
         - system-postgresql
         from:
           kind: ImageStreamTag
-          name: system-postgresql:latest
+          name: system-postgresql:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -1314,7 +1222,6 @@ objects:
   spec:
     accessModes:
     - ReadWriteOnce
-    dataSource: null
     resources:
       requests:
         storage: 1Gi
@@ -1405,7 +1312,7 @@ objects:
         - memcache
         from:
           kind: ImageStreamTag
-          name: system-memcached:latest
+          name: system-memcached:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -1426,7 +1333,6 @@ objects:
   spec:
     accessModes:
     - ReadWriteMany
-    dataSource: null
     resources:
       requests:
         storage: 100Mi
@@ -1563,7 +1469,15 @@ objects:
       threescale_component: system
     name: system
 - apiVersion: v1
-  data:
+  kind: Secret
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${APP_LABEL}
+      threescale_component: system
+      threescale_component_element: smtp
+    name: system-smtp
+  stringData:
     address: ""
     authentication: ""
     domain: ""
@@ -1571,14 +1485,6 @@ objects:
     password: ""
     port: ""
     username: ""
-  kind: ConfigMap
-  metadata:
-    creationTimestamp: null
-    labels:
-      app: ${APP_LABEL}
-      threescale_component: system
-      threescale_component_element: smtp
-    name: smtp
 - apiVersion: v1
   data:
     AMP_RELEASE: ${AMP_RELEASE}
@@ -1631,9 +1537,7 @@ objects:
             command:
             - bash
             - -c
-            - bundle exec rake boot openshift:deploy MASTER_ACCESS_TOKEN="${MASTER_ACCESS_TOKEN}"
-              && bundle exec rake services:create_backend_apis services:update_metric_owners
-              proxy:update_proxy_rule_owners
+            - bundle exec rake boot openshift:deploy
             containerName: system-master
             env:
             - name: AMP_RELEASE
@@ -1832,39 +1736,39 @@ objects:
                   name: backend-listener
             - name: SMTP_ADDRESS
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   key: address
-                  name: smtp
+                  name: system-smtp
             - name: SMTP_USER_NAME
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   key: username
-                  name: smtp
+                  name: system-smtp
             - name: SMTP_PASSWORD
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   key: password
-                  name: smtp
+                  name: system-smtp
             - name: SMTP_DOMAIN
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   key: domain
-                  name: smtp
+                  name: system-smtp
             - name: SMTP_PORT
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   key: port
-                  name: smtp
+                  name: system-smtp
             - name: SMTP_AUTHENTICATION
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   key: authentication
-                  name: smtp
+                  name: system-smtp
             - name: SMTP_OPENSSL_VERIFY_MODE
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   key: openssl.verify.mode
-                  name: smtp
+                  name: system-smtp
             - name: APICAST_ACCESS_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -1885,6 +1789,11 @@ objects:
                 secretKeyRef:
                   key: password
                   name: backend-internal-api
+            - name: MASTER_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: MASTER_ACCESS_TOKEN
+                  name: system-seed
             volumes:
             - system-storage
           failurePolicy: Retry
@@ -2108,39 +2017,39 @@ objects:
                 name: backend-listener
           - name: SMTP_ADDRESS
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: address
-                name: smtp
+                name: system-smtp
           - name: SMTP_USER_NAME
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: username
-                name: smtp
+                name: system-smtp
           - name: SMTP_PASSWORD
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: password
-                name: smtp
+                name: system-smtp
           - name: SMTP_DOMAIN
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: domain
-                name: smtp
+                name: system-smtp
           - name: SMTP_PORT
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: port
-                name: smtp
+                name: system-smtp
           - name: SMTP_AUTHENTICATION
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: authentication
-                name: smtp
+                name: system-smtp
           - name: SMTP_OPENSSL_VERIFY_MODE
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: openssl.verify.mode
-                name: smtp
+                name: system-smtp
           - name: APICAST_ACCESS_TOKEN
             valueFrom:
               secretKeyRef:
@@ -2406,39 +2315,39 @@ objects:
                 name: backend-listener
           - name: SMTP_ADDRESS
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: address
-                name: smtp
+                name: system-smtp
           - name: SMTP_USER_NAME
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: username
-                name: smtp
+                name: system-smtp
           - name: SMTP_PASSWORD
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: password
-                name: smtp
+                name: system-smtp
           - name: SMTP_DOMAIN
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: domain
-                name: smtp
+                name: system-smtp
           - name: SMTP_PORT
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: port
-                name: smtp
+                name: system-smtp
           - name: SMTP_AUTHENTICATION
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: authentication
-                name: smtp
+                name: system-smtp
           - name: SMTP_OPENSSL_VERIFY_MODE
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: openssl.verify.mode
-                name: smtp
+                name: system-smtp
           - name: APICAST_ACCESS_TOKEN
             valueFrom:
               secretKeyRef:
@@ -2703,39 +2612,39 @@ objects:
                 name: backend-listener
           - name: SMTP_ADDRESS
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: address
-                name: smtp
+                name: system-smtp
           - name: SMTP_USER_NAME
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: username
-                name: smtp
+                name: system-smtp
           - name: SMTP_PASSWORD
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: password
-                name: smtp
+                name: system-smtp
           - name: SMTP_DOMAIN
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: domain
-                name: smtp
+                name: system-smtp
           - name: SMTP_PORT
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: port
-                name: smtp
+                name: system-smtp
           - name: SMTP_AUTHENTICATION
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: authentication
-                name: smtp
+                name: system-smtp
           - name: SMTP_OPENSSL_VERIFY_MODE
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: openssl.verify.mode
-                name: smtp
+                name: system-smtp
           - name: APICAST_ACCESS_TOKEN
             valueFrom:
               secretKeyRef:
@@ -2821,7 +2730,7 @@ objects:
         - system-master
         from:
           kind: ImageStreamTag
-          name: amp-system:latest
+          name: amp-system:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3063,39 +2972,39 @@ objects:
                 name: backend-listener
           - name: SMTP_ADDRESS
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: address
-                name: smtp
+                name: system-smtp
           - name: SMTP_USER_NAME
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: username
-                name: smtp
+                name: system-smtp
           - name: SMTP_PASSWORD
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: password
-                name: smtp
+                name: system-smtp
           - name: SMTP_DOMAIN
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: domain
-                name: smtp
+                name: system-smtp
           - name: SMTP_PORT
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: port
-                name: smtp
+                name: system-smtp
           - name: SMTP_AUTHENTICATION
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: authentication
-                name: smtp
+                name: system-smtp
           - name: SMTP_OPENSSL_VERIFY_MODE
             valueFrom:
-              configMapKeyRef:
+              secretKeyRef:
                 key: openssl.verify.mode
-                name: smtp
+                name: system-smtp
           - name: APICAST_ACCESS_TOKEN
             valueFrom:
               secretKeyRef:
@@ -3214,7 +3123,7 @@ objects:
         - system-sidekiq
         from:
           kind: ImageStreamTag
-          name: amp-system:latest
+          name: amp-system:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3363,7 +3272,7 @@ objects:
         - system-sphinx
         from:
           kind: ImageStreamTag
-          name: amp-system:latest
+          name: amp-system:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3412,7 +3321,6 @@ objects:
     name: system-master-apicast
   stringData:
     ACCESS_TOKEN: ${APICAST_ACCESS_TOKEN}
-    BASE_URL: http://${APICAST_ACCESS_TOKEN}@system-master:3000
     PROXY_CONFIGS_ENDPOINT: http://${APICAST_ACCESS_TOKEN}@system-master:3000/master/api/proxy/configs
   type: Opaque
 - apiVersion: v1
@@ -3646,7 +3554,7 @@ objects:
         - zync
         from:
           kind: ImageStreamTag
-          name: amp-zync:latest
+          name: amp-zync:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3758,7 +3666,7 @@ objects:
         - que
         from:
           kind: ImageStreamTag
-          name: amp-zync:latest
+          name: amp-zync:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -3847,7 +3755,7 @@ objects:
         - postgresql
         from:
           kind: ImageStreamTag
-          name: zync-database-postgresql:latest
+          name: zync-database-postgresql:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -4016,7 +3924,7 @@ objects:
         - apicast-staging
         from:
           kind: ImageStreamTag
-          name: amp-apicast:latest
+          name: amp-apicast:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -4147,7 +4055,7 @@ objects:
         - apicast-production
         from:
           kind: ImageStreamTag
-          name: amp-apicast:latest
+          name: amp-apicast:${AMP_RELEASE}
       type: ImageChange
   status:
     availableReplicas: 0
@@ -4218,7 +4126,7 @@ parameters:
 - description: AMP release tag.
   name: AMP_RELEASE
   required: true
-  value: "2.7"
+  value: "2.9"
 - description: Used for object app labels
   name: APP_LABEL
   required: true
@@ -4233,16 +4141,16 @@ parameters:
   value: "null"
 - name: AMP_BACKEND_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/backend-rhel7:3scale2.7
+  value: registry.redhat.io/3scale-amp2/backend-rhel7:3scale2.9
 - name: AMP_ZYNC_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/zync-rhel7:3scale2.7
+  value: registry.redhat.io/3scale-amp2/zync-rhel7:3scale2.9
 - name: AMP_APICAST_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/apicast-gateway-rhel7:3scale2.7
+  value: registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.9
 - name: AMP_SYSTEM_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/system-rhel7:3scale2.7
+  value: registry.redhat.io/3scale-amp2/system-rhel7:3scale2.9
 - description: Zync's PostgreSQL image to use
   name: ZYNC_DATABASE_IMAGE
   required: true
@@ -4250,7 +4158,7 @@ parameters:
 - description: Memcached image to use
   name: MEMCACHED_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/memcached-rhel7:3scale2.7
+  value: registry.redhat.io/3scale-amp2/memcached-rhel7:3scale2.9
 - description: Set to true if the server may bypass certificate verification or connect
     directly over HTTP during image import.
   name: IMAGESTREAM_TAG_IMPORT_INSECURE

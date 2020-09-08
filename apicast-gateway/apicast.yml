@@ -163,8 +163,8 @@ parameters:
   name: RESPONSE_CODES
   required: false
 - name: CONFIGURATION_CACHE
-  description: "For how long to cache the downloaded configuration in seconds. Can be left empty, 0 or greater than 60."
-  value: ""
+  description: "For how long to cache the downloaded configuration in seconds. Can be left empty which will be 0 or greater than 60."
+  value: "300"
   required: false
 - description: "Redis URL. Required for OAuth2 integration. ex: redis://PASSWORD@127.0.0.1:6379/0"
   name: REDIS_URL

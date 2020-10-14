@@ -2,23 +2,18 @@ FROM registry.redhat.io/3scale-amp2/system-rhel7:3scale2.9
 
 USER root
 
-COPY ./oracle-client-files/instantclient-basic*-linux.x64-12.2.*.zip \
-     ./oracle-client-files/instantclient-sdk-linux.x64-12.2.*.zip \
-     ./oracle-client-files/instantclient-odbc-linux.x64-12.2.*.zip \
-     /opt/oracle/
+COPY ./oracle-client-files/instantclient-basic*-linux.x64*.zip \
+     ./oracle-client-files/instantclient-sdk-linux.x64*.zip \
+     ./oracle-client-files/instantclient-odbc-linux.x64*.zip \
+     /opt/system/vendor/oracle/
 
-ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_12_2/ \
-    ORACLE_HOME=/opt/oracle/instantclient_12_2/ \
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient/ \
+    ORACLE_HOME=/opt/oracle/instantclient/ \
     DB=oracle \
     TZ=utc \
     NLS_LANG=AMERICAN_AMERICA.UTF8
 
-
-RUN unzip /opt/oracle/instantclient-basic*-linux.x64-12.2.*.zip -d /opt/oracle/ \
- && unzip /opt/oracle/instantclient-sdk-linux.x64-12.2.*.zip -d /opt/oracle/ \
- && unzip /opt/oracle/instantclient-odbc-linux.x64-12.2.*.zip -d /opt/oracle/ \
- && rm -f /opt/oracle/*.zip \
- && (cd /opt/oracle/instantclient_12_2/ && ln -s libclntsh.so.12.1 libclntsh.so) \
+RUN ./script/oracle/install-instantclient-packages.sh \
  && source /opt/app-root/etc/scl_enable \
  && DB=oracle bundle install --local --deployment --jobs $(grep -c processor /proc/cpuinfo) --retry=5
 

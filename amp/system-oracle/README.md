@@ -5,7 +5,7 @@
 
 In order to work with Oracle Database for Red Hat 3scale API Management, you will need to create a custom image as Red Hat cannot distribute the binaries of Oracle Database client.
 
-You **MUST** download the client (basic-lite or basic), the odbc driver and the sdk for **12.2** in [Oracle Technology Network](http://www.oracle.com/technetwork/database/features/instant-client/index-097480.html).
+You **MUST** download the client (basic-lite or basic), the odbc driver and the sdk for **19.6** in [Oracle Technology Network](http://www.oracle.com/technetwork/database/features/instant-client/index-097480.html).
 
 * Instant Client Package - Basic or Basic Lite
 * Instant Client Package - SDK
@@ -13,9 +13,9 @@ You **MUST** download the client (basic-lite or basic), the odbc driver and the 
 
 Example:
 
-    * instantclient-basiclite-linux.x64-12.2.0.1.0.zip or instantclient-basic-linux.x64-12.2.0.1.0.zip
-    * instantclient-sdk-linux.x64-12.2.0.1.0.zip
-    * instantclient-odbc-linux.x64-12.2.0.1.0-2.zip
+    * instantclient-basiclite-linux.x64-19.6.0.0.0dbru.zip or instantclient-basic-linux.x64-19.6.0.0.0dbru.zip
+    * instantclient-sdk-linux.x64-19.6.0.0.0dbru.zip
+    * instantclient-odbc-linux.x64-19.6.0.0.0dbru.zip
 
 ### Oracle Database user SYSTEM password
 
@@ -140,7 +140,7 @@ Example:
 DATABASE_URL="oracle-enhanced://user:password@my-oracle-database.com:1521/threescalepdb"
 ```
 
-## Oracle 12c Max VARCHAR2 Limits 
+## Oracle 19c Max VARCHAR2 Limits
 
 You need to configure your database properly in order to accomodate 3scale
 

@@ -7,7 +7,7 @@ COPY ./oracle-client-files/instantclient-basic*-linux.x64*.zip \
      ./oracle-client-files/instantclient-odbc-linux.x64*.zip \
      /opt/system/vendor/oracle/
 
-ENV LD_LIBRARY_PATH=/opt/oracle/instantclient/ \
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient/:$LD_LIBRARY_PATH \
     ORACLE_HOME=/opt/oracle/instantclient/ \
     DB=oracle \
     TZ=utc \

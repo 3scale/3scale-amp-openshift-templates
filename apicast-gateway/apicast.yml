@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: 3scale-gateway
   annotations:
-    openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_3scale/2.saas/html/deployment_options/apicast-openshift
+    openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_3scale/2-saas/html-single/administering_the_api_gateway
     openshift.io/display-name: 3scale APIcast API Gateway
     openshift.io/provider-display-name: Red Hat, Inc.
     iconClass: icon-3scale

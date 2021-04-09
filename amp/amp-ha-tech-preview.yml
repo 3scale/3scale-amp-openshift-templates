@@ -180,6 +180,40 @@ objects:
   metadata:
     creationTimestamp: null
     name: amp
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${APP_LABEL}
+      threescale_component: backend
+    name: backend-redis
+  stringData:
+    REDIS_QUEUES_SENTINEL_HOSTS: ${BACKEND_REDIS_QUEUE_SENTINEL_HOSTS}
+    REDIS_QUEUES_SENTINEL_ROLE: ${BACKEND_REDIS_QUEUE_SENTINEL_ROLE}
+    REDIS_QUEUES_URL: ${BACKEND_REDIS_QUEUES_ENDPOINT}
+    REDIS_STORAGE_SENTINEL_HOSTS: ${BACKEND_REDIS_STORAGE_SENTINEL_HOSTS}
+    REDIS_STORAGE_SENTINEL_ROLE: ${BACKEND_REDIS_STORAGE_SENTINEL_ROLE}
+    REDIS_STORAGE_URL: ${BACKEND_REDIS_STORAGE_ENDPOINT}
+  type: Opaque
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${APP_LABEL}
+      threescale_component: system
+    name: system-redis
+  stringData:
+    MESSAGE_BUS_NAMESPACE: ${SYSTEM_MESSAGE_BUS_REDIS_NAMESPACE}
+    MESSAGE_BUS_SENTINEL_HOSTS: ${SYSTEM_MESSAGE_BUS_REDIS_SENTINEL_HOSTS}
+    MESSAGE_BUS_SENTINEL_ROLE: ${SYSTEM_MESSAGE_BUS_REDIS_SENTINEL_ROLE}
+    MESSAGE_BUS_URL: ${SYSTEM_MESSAGE_BUS_REDIS_URL}
+    NAMESPACE: ${SYSTEM_REDIS_NAMESPACE}
+    SENTINEL_HOSTS: ${SYSTEM_REDIS_SENTINEL_HOSTS}
+    SENTINEL_ROLE: ${SYSTEM_REDIS_SENTINEL_ROLE}
+    URL: ${SYSTEM_REDIS_URL}
+  type: Opaque
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
@@ -680,22 +714,6 @@ objects:
   stringData:
     password: ${SYSTEM_BACKEND_PASSWORD}
     username: ${SYSTEM_BACKEND_USERNAME}
-  type: Opaque
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    creationTimestamp: null
-    labels:
-      app: ${APP_LABEL}
-      threescale_component: backend
-    name: backend-redis
-  stringData:
-    REDIS_QUEUES_SENTINEL_HOSTS: ${BACKEND_REDIS_QUEUE_SENTINEL_HOSTS}
-    REDIS_QUEUES_SENTINEL_ROLE: ${BACKEND_REDIS_QUEUE_SENTINEL_ROLE}
-    REDIS_QUEUES_URL: ${BACKEND_REDIS_QUEUES_ENDPOINT}
-    REDIS_STORAGE_SENTINEL_HOSTS: ${BACKEND_REDIS_STORAGE_SENTINEL_HOSTS}
-    REDIS_STORAGE_SENTINEL_ROLE: ${BACKEND_REDIS_STORAGE_SENTINEL_ROLE}
-    REDIS_STORAGE_URL: ${BACKEND_REDIS_STORAGE_ENDPOINT}
   type: Opaque
 - apiVersion: v1
   kind: Secret
@@ -2827,24 +2845,6 @@ objects:
     labels:
       app: ${APP_LABEL}
       threescale_component: system
-    name: system-redis
-  stringData:
-    MESSAGE_BUS_NAMESPACE: ${SYSTEM_MESSAGE_BUS_REDIS_NAMESPACE}
-    MESSAGE_BUS_SENTINEL_HOSTS: ${SYSTEM_MESSAGE_BUS_REDIS_SENTINEL_HOSTS}
-    MESSAGE_BUS_SENTINEL_ROLE: ${SYSTEM_MESSAGE_BUS_REDIS_SENTINEL_ROLE}
-    MESSAGE_BUS_URL: ${SYSTEM_MESSAGE_BUS_REDIS_URL}
-    NAMESPACE: ${SYSTEM_REDIS_NAMESPACE}
-    SENTINEL_HOSTS: ${SYSTEM_REDIS_SENTINEL_HOSTS}
-    SENTINEL_ROLE: ${SYSTEM_REDIS_SENTINEL_ROLE}
-    URL: ${SYSTEM_REDIS_URL}
-  type: Opaque
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    creationTimestamp: null
-    labels:
-      app: ${APP_LABEL}
-      threescale_component: system
     name: system-master-apicast
   stringData:
     ACCESS_TOKEN: ${APICAST_ACCESS_TOKEN}
@@ -3776,7 +3776,7 @@ parameters:
 - description: AMP release tag.
   name: AMP_RELEASE
   required: true
-  value: "2.9"
+  value: "2.10"
 - description: Used for object app labels
   name: APP_LABEL
   required: true
@@ -3791,16 +3791,16 @@ parameters:
   value: "null"
 - name: AMP_BACKEND_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/backend-rhel7:3scale2.9
+  value: registry.redhat.io/3scale-amp2/backend-rhel7:3scale2.10
 - name: AMP_ZYNC_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/zync-rhel7:3scale2.9
+  value: registry.redhat.io/3scale-amp2/zync-rhel7:3scale2.10
 - name: AMP_APICAST_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.9
+  value: registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.10
 - name: AMP_SYSTEM_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/system-rhel7:3scale2.9
+  value: registry.redhat.io/3scale-amp2/system-rhel7:3scale2.10
 - description: Zync's PostgreSQL image to use
   name: ZYNC_DATABASE_IMAGE
   required: true
@@ -3808,7 +3808,7 @@ parameters:
 - description: Memcached image to use
   name: MEMCACHED_IMAGE
   required: true
-  value: registry.redhat.io/3scale-amp2/memcached-rhel7:3scale2.9
+  value: registry.redhat.io/3scale-amp2/memcached-rhel7:3scale2.10
 - description: Set to true if the server may bypass certificate verification or connect
     directly over HTTP during image import.
   name: IMAGESTREAM_TAG_IMPORT_INSECURE

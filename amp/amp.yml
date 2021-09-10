@@ -3111,11 +3111,10 @@ objects:
             name: system-config
         initContainers:
         - command:
-          - bash
+          - sh
           - -c
-          - bundle exec sh -c "until rake boot:redis && curl --output /dev/null --silent
-            --fail --head http://system-master:3000/status; do sleep $SLEEP_SECONDS;
-            done"
+          - until $(curl --output /dev/null --silent --fail --head http://system-master:3000/status);
+            do sleep $SLEEP_SECONDS; done
           env:
           - name: REDIS_URL
             valueFrom:

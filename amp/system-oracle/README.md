@@ -97,7 +97,7 @@ Wait until the build is in 'Complete' state
 
 Save the current 3scale release in an environment variable:
 ```
-$ export THREESCALE_RELEASE=2.10
+$ export THREESCALE_RELEASE=2.11
 ```
 
 Update system-app DeploymentConfig's ImageChangeTrigger:

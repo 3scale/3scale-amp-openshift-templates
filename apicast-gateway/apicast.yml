@@ -118,10 +118,10 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: "2.10.0"
+  value: "2.11.0"
   required: true
 - name: AMP_APICAST_IMAGE
-  value: "registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.10"
+  value: "registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.11"
   required: true
 - description: "Name of the secret containing the THREESCALE_PORTAL_ENDPOINT with the access-token or provider key"
   value: apicast-configuration-url-secret

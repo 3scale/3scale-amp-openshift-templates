@@ -2,9 +2,9 @@ FROM registry.redhat.io/3scale-amp2/system-rhel7:3scale2.11
 
 USER root
 
-COPY ./oracle-client-files/instantclient-basic*-linux.x64*.zip \
-     ./oracle-client-files/instantclient-sdk-linux.x64*.zip \
-     ./oracle-client-files/instantclient-odbc-linux.x64*.zip \
+COPY ./oracle-client-files/instantclient-basic*-linux.*.zip \
+     ./oracle-client-files/instantclient-sdk-linux.*.zip \
+     ./oracle-client-files/instantclient-odbc-linux.*.zip \
      /opt/system/vendor/oracle/
 
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient/:$LD_LIBRARY_PATH \

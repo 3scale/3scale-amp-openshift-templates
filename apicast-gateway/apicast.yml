@@ -3,14 +3,14 @@ kind: Template
 metadata:
   name: 3scale-gateway
   annotations:
-    openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_3scale/2-saas/html-single/administering_the_api_gateway
+    openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_3scale/2.saas/html/deployment_options/apicast-openshift
     openshift.io/display-name: 3scale APIcast API Gateway
     openshift.io/provider-display-name: Red Hat, Inc.
     iconClass: icon-3scale
     description: >-
-      3scale's APIcast is an NGINX based API gateway used to integrate your internal and external
-      API services with 3scale's API Management Platform. It supports OpenID connect to integrate
-      with external Identity Providers such as Red Hat Single Sign On, for API traffic authentication
+      3scale's APIcast is an NGINX based API gateway used to integrate your internal and external 
+      API services with 3scale's API Management Platform. It supports OpenID connect to integrate 
+      with external Identity Providers such as Red Hat Single Sign On, for API traffic authentication 
     tags: api,gateway,3scale
 objects:
 
@@ -118,7 +118,7 @@ objects:
 parameters:
 - name: AMP_RELEASE
   description: "AMP release tag."
-  value: "2.11.0"
+  value: "2.11.1"
   required: true
 - name: AMP_APICAST_IMAGE
   value: "registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.11"
@@ -163,8 +163,8 @@ parameters:
   name: RESPONSE_CODES
   required: false
 - name: CONFIGURATION_CACHE
-  description: "For how long to cache the downloaded configuration in seconds. Can be left empty which will be 0 or greater than 60."
-  value: "300"
+  description: "For how long to cache the downloaded configuration in seconds. Can be left empty, 0 or greater than 60."
+  value: ""
   required: false
 - description: "Redis URL. Required for OAuth2 integration. ex: redis://PASSWORD@127.0.0.1:6379/0"
   name: REDIS_URL

@@ -13,7 +13,8 @@ ENV LD_LIBRARY_PATH=/opt/oracle/instantclient/:$LD_LIBRARY_PATH \
     TZ=utc \
     NLS_LANG=AMERICAN_AMERICA.UTF8
 
-RUN ./script/oracle/install-instantclient-packages.sh \
+RUN ln -s /opt/oracle/instantclient_19_3 /opt/oracle/instantclient_19_6 \
+ && ./script/oracle/install-instantclient-packages.sh \
  && source /opt/app-root/etc/scl_enable \
  && DB=oracle bundle install --local --deployment --jobs $(grep -c processor /proc/cpuinfo) --retry=5
 

@@ -14,7 +14,7 @@ metadata:
     tags: api,gateway,3scale
 objects:
 
-- apiVersion: v1
+- apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
     name: "${APICAST_NAME}"

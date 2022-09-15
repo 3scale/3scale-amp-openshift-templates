@@ -146,6 +146,5 @@ You need to configure your database properly in order to accomodate 3scale
 
 ```
 ALTER SYSTEM SET max_string_size=extended SCOPE=SPFILE;
-ALTER SYSTEM SET compatible='12.2.0.1' SCOPE=SPFILE;
 ```
 

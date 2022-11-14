@@ -20,7 +20,6 @@ Example:
 ### Oracle Database user SYSTEM password
 
 We **need** the Oracle Database user `SYSTEM` password.
-It will create the user and grant the appropriate roles and rights to the user connecting to the database.
 
 
 ## Instructions

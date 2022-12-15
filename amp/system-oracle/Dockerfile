@@ -13,6 +13,19 @@ ENV LD_LIBRARY_PATH=/opt/oracle/instantclient/:$LD_LIBRARY_PATH \
     TZ=utc \
     NLS_LANG=AMERICAN_AMERICA.UTF8
 
+WORKDIR /opt/system
+
+RUN source /opt/app-root/etc/scl_enable \
+    && printf "source 'https://rubygems.org'\ngem 'activerecord-oracle_enhanced-adapter'\ngem 'ruby-oci8'\n" > Gemfile.oracle \
+    && cp Gemfile.lock Gemfile.oracle.lock \
+    && mv .bundle .bundle.bak && mkdir .bundle \
+    && bundle config set --local no_install true \
+    && bundle config set --local cache_all true \
+    && bundle package --gemfile=Gemfile.oracle --no-install --all \
+    && rm -rf Gemfile.oracle* .bundle \
+    && mv .bundle.bak .bundle
+
+
 RUN ./script/oracle/install-instantclient-packages.sh \
  && source /opt/app-root/etc/scl_enable \
  && DB=oracle bundle install --local --deployment --jobs $(grep -c processor /proc/cpuinfo) --retry=5

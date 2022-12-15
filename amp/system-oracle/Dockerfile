@@ -1,4 +1,4 @@
-FROM registry.redhat.io/3scale-amp2/system-rhel7:3scale2.11
+FROM registry.redhat.io/3scale-amp2/system-rhel7:3scale2.13
 
 USER root
 

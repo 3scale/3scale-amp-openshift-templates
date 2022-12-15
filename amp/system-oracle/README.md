@@ -20,7 +20,6 @@ Example:
 ### Oracle Database user SYSTEM password
 
 We **need** the Oracle Database user `SYSTEM` password.
-It will create the user and grant the appropriate roles and rights to the user connecting to the database.
 
 
 ## Instructions
@@ -97,7 +96,7 @@ Wait until the build is in 'Complete' state
 
 Save the current 3scale release in an environment variable:
 ```
-$ export THREESCALE_RELEASE=2.11
+$ export THREESCALE_RELEASE=2.12
 ```
 
 Update system-app DeploymentConfig's ImageChangeTrigger:

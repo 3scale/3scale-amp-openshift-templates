@@ -21,6 +21,8 @@ RUN source /opt/app-root/etc/scl_enable \
     && mv .bundle .bundle.bak && mkdir .bundle \
     && bundle config set --local no_install true \
     && bundle config set --local cache_all true \
+    && bundle config unset mirror.http://rubygems.org/ \
+    && bundle config unset mirror.https://rubygems.org/ \
     && bundle package --gemfile=Gemfile.oracle --no-install --all \
     && rm -rf Gemfile.oracle* .bundle \
     && mv .bundle.bak .bundle
